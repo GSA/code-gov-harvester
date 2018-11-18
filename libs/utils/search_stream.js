@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const Readable = require("stream").Readable;
 const { Logger, ElasticsearchLogger } = require("../loggers");
-const getConfig = require('../config');
+const getConfig = require('../../config');
 
 class SearchStream extends Readable {
 
