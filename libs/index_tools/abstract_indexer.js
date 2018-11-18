@@ -1,15 +1,5 @@
 const moment = require("moment");
-const Logger = require("../../utils/logger");
-
-/* eslint-disable */
-const ElasticSearch = require("elasticsearch");
-
-class ElasticSearchLogger extends Logger {
-  get DEFAULT_LOGGER_NAME() {
-    return "elasticsearch-adapter";
-  }
-}
-/* eslint-enable */
+const { Logger, ElasticsearchLogger } = require("../loggers");
 
 class AbstractIndexer {
 
@@ -23,7 +13,7 @@ class AbstractIndexer {
 
     this.adapter = new adapter({
       hosts: params.esHosts,
-      logger: ElasticSearchLogger
+      logger: ElasticsearchLogger
     });
 
     this.logger = new Logger({ name: this.LOGGER_NAME });
