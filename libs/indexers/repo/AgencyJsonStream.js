@@ -6,7 +6,7 @@ const { Logger } = require('../../loggers');
 const { getValidator } = require('@code.gov/code-gov-validator');
 const Formatter = require('../../formatter');
 const Reporter = require("../../reporter");
-const { Utils } = require("../../../utils");
+const { Utils } = require("../../utils");
 const RulesEngine = require('simple-rules-engine');
 const getRules = require('../../rules');
 const encoding = require('encoding');
@@ -206,7 +206,8 @@ class AgencyJsonStream extends Transform {
     this.logger.debug('Entered _formatCodeJson - Agency: ', agency.acronym);
 
     const {schemaVersion, repos} = validatedRepos;
-    const formatter = new Formatter(this.config)
+    const formatter = new Formatter(this.config);
+
     return Promise.all(
       repos.map(async repo => {
         repo.agency = agency;
