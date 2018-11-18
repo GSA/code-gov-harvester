@@ -17,6 +17,8 @@ class Indexer {
   /**
    * Creates an instance of Indexer.
    *
+   * @constructor
+   * @param {object} config Application configuration object.
    */
   constructor(config) {
     this.logger = new Logger({ name: 'repo-index-script', level: config.LOGGER_LEVEL });
@@ -26,7 +28,8 @@ class Indexer {
   }
 
   /**
-   * Index the repos contained in the agency endpoints file
+   * Index projects from configured data source. See config.AGENCY_ENDPOINTS_FILE
+   * @returns {object} Information of index and aliases created during the indexing process
    */
   async index() {
 
@@ -52,7 +55,7 @@ class Indexer {
 if (require.main === module) {
   let indexer = new Indexer(getConfig(process.env.NODE_ENV));
   indexer.index()
-    .then(() => indexer.logger.debug(`Finished indexing repos`))
+    .then(repoIndexInfo => indexer.logger.debug(`Finished indexing repos ${JSON.stringify(repoIndexInfo)}`))
     .catch(error => indexer.logger.error(error));
 }
 
