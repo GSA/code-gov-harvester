@@ -1,11 +1,11 @@
 const fs = require("fs");
 const JSONStream = require("JSONStream");
 const Reporter = require("../../reporter");
-const AbstractIndexer = require("../abstract_indexer");
+const { AbstractIndexer } = require("../../index_tools");
 const fetch = require('node-fetch');
 
-const AgencyJsonStream = require("../repo/AgencyJsonStream");
-const RepoIndexerStream = require("../repo/RepoIndexStream");
+const AgencyJsonStream = require("./AgencyJsonStream");
+const RepoIndexerStream = require("./RepoIndexStream");
 const ES_MAPPING = require("../../../indexes/repo/mapping.json");
 
 const ES_SETTINGS = require("../../../indexes/repo/settings.json");
