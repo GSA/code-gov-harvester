@@ -132,4 +132,7 @@ class TermIndexer extends AbstractIndexer {
   }
 }
 
-module.exports = TermIndexer;
+module.exports = {
+  TermIndexer,
+  RepoTermIndexerStream
+};
