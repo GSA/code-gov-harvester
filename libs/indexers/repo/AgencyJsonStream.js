@@ -206,11 +206,11 @@ class AgencyJsonStream extends Transform {
     this.logger.debug('Entered _formatCodeJson - Agency: ', agency.acronym);
 
     const {schemaVersion, repos} = validatedRepos;
-
+    const formatter = new Formatter(this.config)
     return Promise.all(
       repos.map(async repo => {
         repo.agency = agency;
-        return Formatter.formatRepo(schemaVersion, repo);
+        return formatter.formatRepo(schemaVersion, repo);
       })
     );
   }
