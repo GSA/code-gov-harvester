@@ -38,7 +38,7 @@ class RepoIndexer extends AbstractIndexer {
     const agencyEndpointsStream = await this.getMetadata();
     const jsonStream = JSONStream.parse("*");
     const agencyJsonStream = new AgencyJsonStream(this.fetchedFilesDir, this.fallbackFilesDir, config);
-    const indexerStream = new RepoIndexerStream(this);
+    const indexerStream = new RepoIndexerStream(this, config);
 
     return new Promise((fulfill, reject) => {
       agencyEndpointsStream
