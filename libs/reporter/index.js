@@ -6,20 +6,17 @@
 ******************************************************************************/
 
 const Jsonfile = require("jsonfile");
-const Logger = require("../../utils/logger");
+const { Logger } = require("../loggers");
 const getConfig = require("../../config");
-const StatusIndexer = require("../indexer/status");
+const StatusIndexer = require("../indexers/status");
 const adapters = require('@code.gov/code-gov-adapter');
-const elasticsearchMappings = require('../../indexes/status/mapping.json');
-const elasticsearchSettings = require('../../indexes/status/settings.json');
-const AliasSwapper = require("../indexer/alias_swapper");
-const IndexCleaner = require("../indexer/index_cleaner");
-const IndexOptimizer = require("../indexer/index_optimizer");
+const { AliasSwapper, IndexCleaner, IndexOptimizer} = require('../index_tools');
+
 const DAYS_TO_KEEP = 7;
 class Reporter {
 
   constructor(config, loggerName) {
-    this.logger = new Logger(loggerName);
+    this.logger = new Logger({ name: loggerName, level: config.LOGGER_LEVEL });
     this.config = config;
     this.report = {
       timestamp: (new Date()).toString(),
@@ -77,10 +74,10 @@ class Reporter {
 
   async indexReport() {
     const params = {
-      "esAlias": "status",
-      "esType": "status",
-      "esMapping": elasticsearchMappings,
-      "esSettings": elasticsearchSettings,
+      "esAlias": this.config.STATUS_INDEX_CONFIG.esAlias,
+      "esType": this.config.STATUS_INDEX_CONFIG.esType,
+      "esMapping": this.config.STATUS_INDEX_CONFIG.mappings,
+      "esSettings": this.config.STATUS_INDEX_CONFIG.settings,
       "esHosts": this.config.ES_HOST
     };
     const adapter = adapters.elasticsearch.ElasticsearchAdapter;

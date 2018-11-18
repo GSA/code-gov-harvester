@@ -11,10 +11,16 @@ const Jsonfile = require('jsonfile');
  * @returns {object} Object with index mappings and settings.
  */
 function getIndexConfig(index) {
-  const mappings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/mapping.json`));
-  const settings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/settings.json`));
+  if(['repo', 'status', 'term'].includes(index)) {
+    const mappings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/mapping.json`));
+    const settings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/settings.json`));
+    const esAlias = index === 'status' ? index : `${index}s`;
+    const esType = index;
 
-  return { mappings, settings }
+    return { mappings, settings, esAlias, esType }
+  } else {
+    throw new Error(`[ERROR] getIndexConfig - Index not recognized: ${index}`);
+  }
 }
 
 /**
@@ -22,7 +28,7 @@ function getIndexConfig(index) {
  * If running on Cloud Foundry the service name is fetched from the environment to later get the service configuration from Cloud Foundry.
  * If not running on Cloud Foundry the Elasticsearch service URL is obtained from environment variables.
  * Defaults to `http://localhost:9200`
- * @default
+ *
  * @param {object} cloudFoundryEnv - Cloud Foundry app environment object.
  * @returns {string} - The Elasticsearch service URL
  */

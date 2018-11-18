@@ -1,6 +1,6 @@
-const AbstractIndexer = require("../abstract_indexer");
+const { AbstractIndexer } = require("../../index_tools");
 const crypto = require("crypto");
-const Logger = require('../../../utils/logger');
+const Logger = require('../../loggers');
 
 class StatusIndexer extends AbstractIndexer {
   get LOGGER_NAME() {

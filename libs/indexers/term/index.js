@@ -4,26 +4,6 @@ const AbstractIndexer     = require("../abstract_indexer");
 const RepoTermLoaderStream= require("./repo_term_loader_stream");
 const getConfig = require('../../../config');
 
-// NOTE: dependent on elasticsearch repos being indexed
-
-const ES_REPO_MAPPING = require("../../../indexes/repo/mapping.json");
-const ES_REPO_SETTINGS = require("../../../indexes/repo/settings.json");
-const ES_REPO_PARAMS = {
-  "esAlias": "repos",
-  "esType": "repo",
-  "esMapping": ES_REPO_MAPPING,
-  "esSettings": ES_REPO_SETTINGS
-};
-
-const ES_TERM_MAPPING = require("../../../indexes/term/mapping.json");
-const ES_TERM_SETTINGS = require("../../../indexes/term/settings.json");
-const ES_TERM_PARAMS = {
-  "esAlias": "terms",
-  "esType": "term",
-  "esMapping": ES_TERM_MAPPING,
-  "esSettings": ES_TERM_SETTINGS
-};
-
 class RepoTermIndexerStream extends Writable {
 
   constructor(termIndexer) {
@@ -77,15 +57,20 @@ class TermIndexer extends AbstractIndexer {
     return "term-indexer";
   }
 
-  constructor(adapter, params, config) {
+  constructor(adapter, config) {
+    const indexParams = {
+      esHosts: config.ES_HOST,
+      esAlias: config.TERM_INDEX_CONFIG.esAlias,
+      esType: config.TERM_INDEX_CONFIG.esType,
+      esMapping: config.TERM_INDEX_CONFIG.mappings,
+      esSettings: config.TERM_INDEX_CONFIG.settings
+    }
 
-    params.esHosts = config.ES_HOST;
-
-    super(adapter, params);
+    super(adapter, indexParams);
 
     let searchQuery = {
-      index: ES_REPO_PARAMS.esAlias,
-      type: ES_REPO_PARAMS.esType,
+      index: config.REPO_INDEX_CONFIG.esAlias,
+      type: config.REPO_INDEX_CONFIG.esType,
       body: {}
     };
     this.ss = new SearchStream(adapter, searchQuery);
@@ -104,7 +89,8 @@ class TermIndexer extends AbstractIndexer {
   }
 
   static async init(adapter) {
-    let termIndexer = new TermIndexer(adapter, ES_TERM_PARAMS, getConfig(process.env.NODE_ENV));
+
+    let termIndexer = new TermIndexer(adapter, getConfig(process.env.NODE_ENV));
     termIndexer.logger.info(`Started indexing (${termIndexer.esType}) indices.`);
 
     try {

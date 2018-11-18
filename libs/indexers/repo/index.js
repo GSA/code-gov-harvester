@@ -6,15 +6,6 @@ const fetch = require('node-fetch');
 
 const AgencyJsonStream = require("./AgencyJsonStream");
 const RepoIndexerStream = require("./RepoIndexStream");
-const ES_MAPPING = require("../../../indexes/repo/mapping.json");
-
-const ES_SETTINGS = require("../../../indexes/repo/settings.json");
-const ES_PARAMS = {
-  "esAlias": "repos",
-  "esType": "repo",
-  "esMapping": ES_MAPPING,
-  "esSettings": ES_SETTINGS
-};
 
 class RepoIndexer extends AbstractIndexer {
 
@@ -74,7 +65,10 @@ class RepoIndexer extends AbstractIndexer {
   static async init(adapter, config) {
     const params = {
       esHosts: config.ES_HOST,
-      ...ES_PARAMS
+      esAlias: config.REPO_INDEX_CONFIG.esAlias,
+      esType: config.REPO_INDEX_CONFIG.esType,
+      esMapping: config.REPO_INDEX_CONFIG.mappings,
+      esSettings: config.REPO_INDEX_CONFIG.settings
     }
     const repoIndexer = new RepoIndexer({
       adapter,
