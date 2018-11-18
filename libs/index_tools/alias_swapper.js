@@ -11,8 +11,10 @@ class AliasSwapper {
   /**
    * Creates an instance of AliasSwapper.
    *
+   * @constructor
    * @param {object} adapter The search adapter to use for connecting to ElasticSearch.
    * @param {object} config The configuration object to use.
+   * @param {object} logger The logger instance to use with the AliasSwapper.
    */
   constructor({ adapter, config, logger }) {
     this.adapter = new adapter({
@@ -141,17 +143,26 @@ class AliasSwapper {
 
 if (require.main === module) {
   const logger = new Logger({ name: 'alias-swapper' });
-  const [targetIndex, alias] = process.argv;
+  try {
+    if(process.argv.length < 4) {
+      throw new Error('Not enough parameters passed. targetIndex and alias are required.')
+    }
 
-  AliasSwapper.swapAlias({
-    adapter: adapter.elasticsearch.ElasticsearchAdapter,
-    targetIndex,
-    alias,
-    config: getConfig(process.env.NODE_ENV),
-    logger
-  })
-    .then(() => logger.info(`Finished swapping alias: ${alias} for index: ${targetIndex}`))
-    .catch(error => indexer.logger.error(error));
+    const targetIndex = process.argv[2];
+    const alias = process.argv[3];
+
+    AliasSwapper.swapAlias({
+      adapter: adapter.elasticsearch.ElasticsearchAdapter,
+      targetIndex,
+      alias,
+      config: getConfig(process.env.NODE_ENV),
+      logger
+    })
+      .then(() => logger.info(`Finished swapping alias: ${alias} for index: ${targetIndex}`))
+      .catch(error => indexer.logger.error(error));
+  } catch(error) {
+    logger.error('There was an error executing the alias-swapper.', error);
+  }
 }
 
 module.exports = AliasSwapper;

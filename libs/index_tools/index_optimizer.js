@@ -1,3 +1,4 @@
+const adapters = require('@code.gov/code-gov-adapter');
 const { Logger, ElasticsearchLogger } = require('../loggers');
 const getConfig = require('../../config');
 
@@ -12,11 +13,13 @@ class IndexOptimizer {
    * Creates an instance of AliasSwapper.
    *
    * @constructor
-   * @param {any} adapter The search adapter to use for connecting to ElasticSearch
+   * @param {object} adapter The search adapter to use for connecting to ElasticSearch. Must be a constructor.
+   * @param {string[]} hosts A list of Elasticsearch hosts
+   * @param {object} logger A logger instance of Winston or Bunyan like loggers.
    */
-  constructor(adapter, hosts) {
+  constructor(adapter, hosts, logger=undefined) {
     this.adapter = new adapter({ hosts, logger: ElasticsearchLogger });
-    this.logger = new Logger({ name: 'index-optimizer'});
+    this.logger = logger ? logger : new Logger({ name: 'index-optimizer'});
   }
 
   /**
@@ -24,17 +27,14 @@ class IndexOptimizer {
    * all elasticsearch servers return the same scores for
    * searches.
    *
-   * @param {any} indexName The index to optimize.
+   * @param {string} index The index to optimize.
+   * @returns {Promise}
    */
-  async forceMerge(indexName) {
-    this.logger.info(`Optimizing Index (${indexName})`);
+  async forceMerge({ maxNumSegments=1, index, requestTimeout=30000 }) {
+    this.logger.info(`Optimizing Index (${index})`);
 
     try {
-      await this.adapter.forceMerge({
-        maxNumSegments: 1,
-        index: indexName,
-        requestTimeout: 90000
-      });
+      return await this.adapter.forceMerge({ maxNumSegments, index, requestTimeout });
     } catch(error) {
       this.logger.trace(error);
       throw error;
@@ -45,24 +45,65 @@ class IndexOptimizer {
    * Initializes and executes the optimizing of for repos
    *
    * @static
-   * @param {any} adapter The search adapter to use for making requests to ElasticSearch
-   * @param {any} repoIndexInfo Information about the index and alias for repos
-   * @param {any} callback
+   * @param {object} adapter An Elasticsearch adapter constructor.
+   * @param {string} index The index name to optimize.
+   * @param {object} config The current execution configuration.
+   * @param {[object]} logger A Winston or Bunyan like logger instance. Defaults to undefined
    */
-  static async optimizeIndex(adapter, index, config) {
+  static async optimizeIndex(adapter, index, requestTimeout=30000, config, logger=undefined) {
 
-    let optimizer = new IndexOptimizer(adapter, config.ES_HOST);
+    let optimizer = new IndexOptimizer(adapter, config.ES_HOST, logger);
     optimizer.logger.info(`Starting index optimization.`);
     try {
-      await optimizer.forceMerge(index);
-      optimizer.logger.info(`Finished optimizing indices.`);
+      return await optimizer.forceMerge({
+        index,
+        requestTimeout
+      });
     } catch(error) {
       optimizer.logger.error(error);
       throw error;
     }
-
   }
+}
 
+if(!require.main === 'module') {
+  const config = getConfig(porcess.env.NODE_ENV);
+  const logger = new Logger({ name: 'index-optimizer' });
+
+  try {
+    if(process.argv.length > 2) {
+      let index;
+      let requestTimeout = 30000;
+
+      if(process.argv[2]) {
+        index = process.argv[2]
+      } else {
+        throw new Error('Index was not supplied.')
+      }
+
+      if(process.argv[3]) {
+        if( isNaN(parseInt(process.argv[3])) || parseInt(process.argv[3]) < 0 ) {
+          throw new Error('Timeout option must be a valid positive number.')
+        }
+
+        requestTimeout = parseInt(process.argv[3]);
+      }
+
+      IndexOptimizer.optimizeIndex({
+        adapter: apapters.elasticsearch.ElasticsearchAdapter,
+        index,
+        requestTimeout,
+        config,
+        logger
+      })
+        .then(() => logger.info(`Finished optimizing indices.`))
+        .catch(error => logger.error(`An error occurred while optimizing the index: ${index}`, error));
+    } else {
+      throw new Error('Not enough arguments were passed to the script. The minimum arguments expected is the index name or alias.')
+    }
+  } catch(error) {
+    logger.error(`An error has occurred while optimizing`, error);
+  }
 }
 
 module.exports = IndexOptimizer;
