@@ -1,6 +1,6 @@
 const getConfig = require('../../config');
-const RepoIndexer = require("./repo/index.js");
-const TermIndexer = require("./term/index.js");
+const RepoIndexer = require("./repo");
+const TermIndexer = require("./term");
 const { Logger } = require("../../libs/loggers");
 
 /**
