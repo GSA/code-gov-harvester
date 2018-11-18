@@ -3,7 +3,11 @@ const path = require('path');
 const dotenv = require('dotenv');
 
 /**
- * Get the Elasticsearch service URL. Defaults to `http://localhost:9200`
+ * Get the Elasticsearch service URL.
+ * If running on Cloud Foundry the service name is fetched from the environment to later get the service configuration from Cloud Foundry.
+ * If not running on Cloud Foundry the Elasticsearch service URL is obtained from environment variables.
+ * Defaults to `http://localhost:9200`
+ * @default
  * @param {object} cloudFoundryEnv - Cloud Foundry app environment object.
  * @returns {string} - The Elasticsearch service URL
  */
@@ -17,9 +21,9 @@ function getElasticsearchUri(cloudFoundryEnv) {
 
     return elasticSearchCredentials.uri
       ? elasticSearchCredentials.uri
-      : 'http://elastic:changeme@localhost:9200';
+      : 'http://localhost:9200';
   }
-  return process.env.ES_URI ? process.env.ES_URI : 'http://elastic:changeme@localhost:9200';
+  return process.env.ES_URI ? process.env.ES_URI : 'http://localhost:9200';
 }
 
 /**
@@ -39,7 +43,6 @@ function getAppFilesDirectories() {
 
   return {
     AGENCY_ENDPOINTS_FILE: filePath,
-    REPORT_FILEPATH: path.join(path.dirname(__dirname), "/data/status/report.json"),
     DISCOVERED_DIR: path.join(path.dirname(__dirname), "/data/discovered"),
     FETCHED_DIR: path.join(path.dirname(__dirname), "/data/fetched"),
     DIFFED_DIR: path.join(path.dirname(__dirname), "/data/diffed"),
@@ -54,7 +57,9 @@ function getAppFilesDirectories() {
  */
 function getConfig(env='development') {
   let config = {
-    prod_envs: ['prod', 'production']
+    prod_envs: ['prod', 'production'],
+    staging_envs: ['stag', 'staging'],
+    development_envs: ['dev', 'development', 'testing', 'test']
   };
 
   const cloudFoundryEnv = cfenv.getAppEnv();
