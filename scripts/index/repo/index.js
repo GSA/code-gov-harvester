@@ -1,19 +1,11 @@
 const getConfig = require("../../../config");
-const RepoIndexer = require("../../../services/indexer/repo");
-const AliasSwapper = require("../../../services/indexer/alias_swapper");
-const IndexCleaner = require("../../../services/indexer/index_cleaner");
+const RepoIndexer = require("../../../libs/indexers/repo");
+const { AliasSwapper, IndexCleaner, IndexOptimizer } = require("../../../libs/index_tools");
 
 const { Logger } = require("../../../libs/loggers");
 const adapters = require('@code.gov/code-gov-adapter');
 
-const IndexOptimizer = require("../../../services/indexer/index_optimizer");
-
 const DAYS_TO_KEEP = process.env.DAYS_TO_KEEP || 2;
-class ElasticSearchLogger extends Logger {
-  get DEFAULT_LOGGER_NAME() {
-    return "elasticsearch";
-  }
-}
 
 /**
  * Defines the class responsible for creating and managing the elasticsearch indexes
