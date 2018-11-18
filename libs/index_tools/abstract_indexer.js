@@ -76,4 +76,6 @@ class AbstractIndexer {
 
 }
 
-module.exports = AbstractIndexer;
+module.exports = {
+  AbstractIndexer
+};
