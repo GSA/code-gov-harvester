@@ -1,6 +1,21 @@
 const cfenv = require('cfenv');
 const path = require('path');
 const dotenv = require('dotenv');
+const Jsonfile = require('jsonfile');
+
+/**
+ * Gets the configuration files for a given index name.
+ * Supported index names are: repo, term, and status.
+ *
+ * @param {string} index Index to get the configs for
+ * @returns {object} Object with index mappings and settings.
+ */
+function getIndexConfig(index) {
+  const mappings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/mapping.json`));
+  const settings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/settings.json`));
+
+  return { mappings, settings }
+}
 
 /**
  * Get the Elasticsearch service URL.
@@ -100,6 +115,10 @@ function getConfig(env='development') {
   config.GET_REMOTE_METADATA = process.env.GET_REMOTE_METADATA && process.env.GET_REMOTE_METADATA === 'true';
   config.GET_GITHUB_DATA = process.env.GET_GITHUB_DATA && process.env.GET_GITHUB_DATA === 'true';
   config.ES_HOST = getElasticsearchUri(cloudFoundryEnv);
+
+  config.REPO_INDEX_CONFIG = getIndexConfig('repo');
+  config.TERM_INDEX_CONFIG = getIndexConfig('term');
+  config.STATUS_INDEX_CONFIG = getIndexConfig('status');
 
   Object.assign(config, getAppFilesDirectories());
 
