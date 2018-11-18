@@ -6,9 +6,9 @@ const { Logger } = require('../../loggers');
 const { getValidator } = require('@code.gov/code-gov-validator');
 const Formatter = require('../../formatter');
 const Reporter = require("../../reporter");
-const Utils = require("../../../utils");
+const { Utils } = require("../../../utils");
 const RulesEngine = require('simple-rules-engine');
-const getRules = require('../../validator/rules');
+const getRules = require('../../rules');
 const encoding = require('encoding');
 
 class AgencyJsonStream extends Transform {
