@@ -1,0 +1,29 @@
+{
+  "term": {
+    "properties": {
+      "term_key": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "term": {
+        "type": "keyword",
+        "normalizer": "lowercase",
+        "copy_to": "term_suggest"
+      },
+      "term_suggest": {
+        "type": "text",
+        "analyzer": "autocomplete_index",
+        "search_analyzer": "autocomplete_search"
+      },
+      "term_type": {
+        "type": "keyword"
+      },
+      "count": {
+        "type": "long"
+      },
+      "count_normalized": {
+        "type": "double"
+      }
+    }
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "status": {
+    "properties": {
+      "last_data_harvest": {
+        "type": "date"
+      },
+      "version": {
+        "type": "keyword"
+      },
+      "agency": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "text",
+            "analyzer": "englishfulltext",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
+          },
+          "acronym": {
+            "type": "keyword",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
+          },
+          "website": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "codeUrl": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "requirements": {
+            "type": "object",
+            "properties": {
+              "agencyWidePolicy": {
+                "type": "float"
+              },
+              "openSourceRequirement": {
+                "type": "float"
+              },
+              "inventoryRequirement": {
+                "type": "float"
+              },
+              "schemaFormat": {
+                "type": "float"
+              },
+              "overallCompliance": {
+                "type": "float"
+              }
+            }
+          }
+        }
+      },
+      "issues": {
+        "type": "nested",
+        "properties": {
+          "organization": {
+            "type": "text",
+            "analyzer": "englishfulltext",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
+          },
+          "project_name": {
+            "type": "text",
+            "analyzer": "englishfulltext",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
+          },
+          "errors": {
+            "type": "nested",
+            "properties": {
+              "keyword": {
+                "type": "keyword"
+              },
+              "dataPath": {
+                "type": "keyword"
+              },
+              "schemaPath": {
+                "type": "keyword"
+              },
+              "params": {
+                "type": "object"
+              },
+              "message": {
+                "type": "text",
+                "analyzer": "englishfulltext"
+              }
+            }
+          },
+          "warning": {
+            "type": "nested",
+            "properties": {
+              "keyword": {
+                "type": "keyword"
+              },
+              "dataPath": {
+                "type": "keyword"
+              },
+              "schemaPath": {
+                "type": "keyword"
+              },
+              "params": {
+                "type": "object"
+              },
+              "message": {
+                "type": "text",
+                "analyzer": "englishfulltext"
+              }
+            }
+          },
+          "enhancements": {
+            "type": "nested",
+            "properties": {
+              "keyword": {
+                "type": "keyword"
+              },
+              "dataPath": {
+                "type": "keyword"
+              },
+              "schemaPath": {
+                "type": "keyword"
+              },
+              "params": {
+                "type": "object"
+              },
+              "message": {
+                "type": "text",
+                "analyzer": "englishfulltext"
+              }
+            }
+          }
+        }
+      },
+      "fallback_used": {
+        "type": "boolean"
+      }
+    }
+  }
+}
