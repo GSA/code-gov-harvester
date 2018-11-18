@@ -9,7 +9,6 @@ const Reporter = require("../../reporter");
 const Utils = require("../../../utils");
 const RulesEngine = require('simple-rules-engine');
 const getRules = require('../../validator/rules');
-const logger = new Logger({name: 'agency-json-stream'});
 const encoding = require('encoding');
 
 class AgencyJsonStream extends Transform {
@@ -20,10 +19,11 @@ class AgencyJsonStream extends Transform {
     this.fetchedDir = fetchedDir;
     this.fallbackDir = fallbackDir;
     this.config = config;
+    this.logger = new Logger({ name: 'agency-json-stream', level: config.LOGGER_LEVEL });
   }
 
   _saveFetchedCodeJson(agencyAcronym, codeJson) {
-    logger.debug('Entered saveFetchedCodeJson - Agency: ', agencyAcronym);
+    this.logger.debug('Entered saveFetchedCodeJson - Agency: ', agencyAcronym);
 
     Jsonfile.spaces = 2;
     const fetchedFilepath = path.join(this.fetchedDir, `${agencyAcronym}.json`);
@@ -31,13 +31,13 @@ class AgencyJsonStream extends Transform {
     try {
       Jsonfile.writeFile(fetchedFilepath, codeJson, { spaces: 2 }, (error) => {
         if (error) {
-          logger.error(error);
+          this.logger.error(error);
         } else {
-          logger.debug(`Saved fetched data for ${agencyAcronym}`, fetchedFilepath);
+          this.logger.debug(`Saved fetched data for ${agencyAcronym}`, fetchedFilepath);
         }
       });
     } catch(err) {
-      logger.error(err);
+      this.logger.error(err);
     }
   }
 
@@ -54,7 +54,7 @@ class AgencyJsonStream extends Transform {
   }
 
   async _getAgencyCodeJson(agency){
-    logger.info('Entered _getAgencyCodeJson - Agency: ', agency.acronym);
+    this.logger.info('Entered _getAgencyCodeJson - Agency: ', agency.acronym);
 
     if(this.config.isProd) {
       const errorMessage = 'FAILURE: There was an error fetching the code.json:';
@@ -66,11 +66,11 @@ class AgencyJsonStream extends Transform {
           timeout: 180000
         });
       } catch(error) {
-        logger.error(`Could not fetch code.json for agency: ${agency}`, error);
+        this.logger.error(`Could not fetch code.json for agency: ${agency}`, error);
       }
 
       if(response && response.status >= 400) {
-        logger.warning(
+        this.logger.warning(
           `${errorMessage} ${agency.codeUrl} returned ${response.status} and
           Content-Type ${response.headers['Content-Type']}. Using fallback data for indexing.`);
 
@@ -92,7 +92,7 @@ class AgencyJsonStream extends Transform {
 
         return jsonData;
       } catch(error) {
-        logger.error(`There was an error parsing JSON for agency: ${agency.acronym}`, error);
+        this.logger.error(`There was an error parsing JSON for agency: ${agency.acronym}`, error);
         Reporter.reportFallbackUsed(agency.acronym, true);
         return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
       }
@@ -109,7 +109,7 @@ class AgencyJsonStream extends Transform {
    * @returns {object} Object with schemaVersion of the supplied code.json and an array of it's validated repositories.
    */
   async _validateAgencyRepos(agency, codeJson) {
-    logger.debug('Entered _validateAgencyRepos');
+    this.logger.debug('Entered _validateAgencyRepos');
 
     let reportDetails = [];
     let reportString = "";
@@ -127,7 +127,7 @@ class AgencyJsonStream extends Transform {
 
     if(this.config.supportedSchemaVersions.includes(codeJson.version)) {
       if(!repos || repos.length < 1) {
-        logger.error(`ERROR: ${agency.acronym} code.json has no projects or releaseEvents.`);
+        this.logger.error(`ERROR: ${agency.acronym} code.json has no projects or releaseEvents.`);
         reportString = "NOT COMPLIANT: ";
         reportDetails.push(`Agency has not releases/repositories published.`);
       } else {
@@ -162,7 +162,7 @@ class AgencyJsonStream extends Transform {
               }
               Reporter.reportIssues(agency.acronym, results);
             })
-            .catch(error => logger.error(error));
+            .catch(error => this.logger.error(error));
           validator.cleaner(repo);
           return repo;
         });
@@ -203,7 +203,7 @@ class AgencyJsonStream extends Transform {
 
   _formatRepos(agency, validatedRepos) {
 
-    logger.debug('Entered _formatCodeJson - Agency: ', agency.acronym);
+    this.logger.debug('Entered _formatCodeJson - Agency: ', agency.acronym);
 
     const {schemaVersion, repos} = validatedRepos;
 
@@ -216,7 +216,7 @@ class AgencyJsonStream extends Transform {
   }
 
   _transform(agency, enc, callback) {
-    logger.debug('Entered _transform - Agency: ', agency.acronym);
+    this.logger.debug('Entered _transform - Agency: ', agency.acronym);
     Reporter.reportMetadata(agency.acronym, { agency });
 
     this._getAgencyCodeJson(agency)
@@ -234,7 +234,7 @@ class AgencyJsonStream extends Transform {
       .then(scoredRepos => scoredRepos.forEach(repo => this.push(repo)))
       .then(() => callback())
       .catch(error => {
-        logger.error(error);
+        this.logger.error(error);
         callback();
       });
   }
