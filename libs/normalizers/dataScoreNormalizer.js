@@ -1,7 +1,7 @@
-const getConfig = require('../../../config');
-const Logger = require('../../../utils/logger');
+const getConfig = require('../../config');
+const { Logger } = require('../loggers');
 const BodyBuilder = require('bodybuilder');
-const config = getConfig(process.env.NODE_ENV);
+const adapters = require('@code.gov/code-gov-adapter');
 
 function getBody(from, size) {
   const bodybuilder = new BodyBuilder();
@@ -35,28 +35,46 @@ async function getRepos({from=0, size=100, collection=[], adapter, index}) {
 
   return await getRepos({ from, size, collection: collection.concat(normalizedData), adapter, index });
 }
-async function normalizeRepoScores(adapter, repoIndexInfo) {
+async function normalizeRepoScores({ adapter, index, type, config, log=undefined}) {
   const elasticSearchAdapter = new adapter({ hosts: config.ES_HOST, logger: Logger });
-  const logger = new Logger({ name: 'data-score-normalizer' });
-  const index = repoIndexInfo.esIndex;
+  const logger = log
+    ? log
+    : new Logger({ name: 'data-score-normalizer', level: config.LOGGER_LEVEL });
 
   logger.info('Fetching repos');
   const {total, data} = await getRepos({from:0, size: 100, adapter: elasticSearchAdapter, index});
-  logger.debug(`Fetched ${total} repos`);
+  logger.debug(`Fetched ${total} items from index: ${index}`);
 
   try {
-    for(let repo of data) {
+    for(let document of data) {
       await elasticSearchAdapter.updateDocument({
         index,
-        type: 'repo',
-        id: repo.repoID,
-        document: repo
+        type,
+        id: document.repoID,
+        document
       });
     }
     logger.info(`Updated ${total} repos`);
   } catch(error) {
     throw error;
   }
+}
+
+if(require.main === module) {
+  const config = getConfig(process.env.NODE_ENV);
+  const adapter = adapters.elasticsearch.ElasticsearchAdapter;
+  const log = new Logger({ name: 'data-score-normalization', level: config.LOGGER_LEVEL });
+
+  if(process.argv.length < 4) {
+    throw new Error('Not enough parameters passed. targetIndex and alias are required.')
+  }
+
+  const index = process.argv[2]
+  const type = process.argv[3]
+
+  normalizeRepoScores({ adapter, index, type , config, log })
+    .then(() => logger.info('Finished score normalization.'))
+    .catch(error => logger.error(error));
 }
 
 module.exports = {
