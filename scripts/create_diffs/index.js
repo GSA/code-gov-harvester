@@ -18,7 +18,7 @@ class CreateDiffStream extends Writable {
   }
 
   _readFile(folderDir, filename, next) {
-    const filePath = path.join(this.config.FETCHED_DIR, filename);
+    const filePath = path.join(folderDir, filename);
     Jsonfile.readFile(filePath, next);
   }
   _performDiff(agency, callback) {
