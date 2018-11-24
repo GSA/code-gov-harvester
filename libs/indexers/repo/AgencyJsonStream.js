@@ -23,7 +23,7 @@ class AgencyJsonStream extends Transform {
   }
 
   _saveFetchedCodeJson(agencyAcronym, codeJson) {
-    this.logger.debug('Entered saveFetchedCodeJson - Agency: ', agencyAcronym);
+    this.logger.debug(`Entered saveFetchedCodeJson - Agency: ${agencyAcronym}`);
 
     Jsonfile.spaces = 2;
     const fetchedFilepath = path.join(this.fetchedDir, `${agencyAcronym}.json`);
@@ -54,7 +54,7 @@ class AgencyJsonStream extends Transform {
   }
 
   async _getAgencyCodeJson(agency){
-    this.logger.info('Entered _getAgencyCodeJson - Agency: ', agency.acronym);
+    this.logger.info(`Entered _getAgencyCodeJson - Agency: ${agency.acronym}`);
 
     if(this.config.isProd) {
       const errorMessage = 'FAILURE: There was an error fetching the code.json:';
@@ -66,13 +66,13 @@ class AgencyJsonStream extends Transform {
           timeout: 180000
         });
       } catch(error) {
-        this.logger.error(`Could not fetch code.json for agency: ${agency}`, error);
+        this.logger.error(`Could not fetch code.json for agency: ${agency.acronym}`, error);
       }
 
       if(response && response.status >= 400) {
         this.logger.warning(
-          `${errorMessage} ${agency.codeUrl} returned ${response.status} and
-          Content-Type ${response.headers['Content-Type']}. Using fallback data for indexing.`);
+          `${errorMessage} ${agency.codeUrl} returned ${response.status} and ` +
+          `Content-Type ${response.headers['Content-Type']}. Using fallback data for indexing.`);
 
         Reporter.reportFallbackUsed(agency.acronym, true);
         return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
@@ -203,7 +203,7 @@ class AgencyJsonStream extends Transform {
 
   _formatRepos(agency, validatedRepos) {
 
-    this.logger.debug('Entered _formatCodeJson - Agency: ', agency.acronym);
+    this.logger.debug(`Entered _formatCodeJson - Agency: ${agency.acronym}`);
 
     const {schemaVersion, repos} = validatedRepos;
     const formatter = new Formatter(this.config);
@@ -217,7 +217,7 @@ class AgencyJsonStream extends Transform {
   }
 
   _transform(agency, enc, callback) {
-    this.logger.debug('Entered _transform - Agency: ', agency.acronym);
+    this.logger.debug(`Entered _transform - Agency: ${agency.acronym}`);
     Reporter.reportMetadata(agency.acronym, { agency });
 
     this._getAgencyCodeJson(agency)
