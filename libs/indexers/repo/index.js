@@ -68,7 +68,8 @@ class RepoIndexer extends AbstractIndexer {
       esAlias: config.REPO_INDEX_CONFIG.esAlias,
       esType: config.REPO_INDEX_CONFIG.esType,
       esMapping: config.REPO_INDEX_CONFIG.mappings,
-      esSettings: config.REPO_INDEX_CONFIG.settings
+      esSettings: config.REPO_INDEX_CONFIG.settings,
+      esApiVersion: config.ELASTICSEARCH_API_VERSION
     }
     const repoIndexer = new RepoIndexer({
       adapter,
