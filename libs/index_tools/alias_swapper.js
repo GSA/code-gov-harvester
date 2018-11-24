@@ -164,7 +164,7 @@ if (require.main === module) {
       .then(() => logger.info(`Finished swapping alias: ${alias} for index: ${targetIndex}`))
       .catch(error => indexer.logger.error(error));
   } catch(error) {
-    logger.error('There was an error executing the alias-swapper.', error);
+    logger.error(`There was an error executing the alias-swapper. ${error}`);
   }
 }
 
