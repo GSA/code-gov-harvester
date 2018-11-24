@@ -1,6 +1,6 @@
-const Writable            = require("stream").Writable;
-const SearchStream        = require("../../../utils/search_stream");
-const AbstractIndexer     = require("../abstract_indexer");
+const Writable = require("stream").Writable;
+const { SearchStream } = require("../../utils");
+const { AbstractIndexer } = require("../../index_tools");
 const RepoTermLoaderStream= require("./repo_term_loader_stream");
 const getConfig = require('../../../config');
 
@@ -63,7 +63,8 @@ class TermIndexer extends AbstractIndexer {
       esAlias: config.TERM_INDEX_CONFIG.esAlias,
       esType: config.TERM_INDEX_CONFIG.esType,
       esMapping: config.TERM_INDEX_CONFIG.mappings,
-      esSettings: config.TERM_INDEX_CONFIG.settings
+      esSettings: config.TERM_INDEX_CONFIG.settings,
+      esApiVersion: config.ELASTICSEARCH_API_VERSION
     }
 
     super(adapter, indexParams);
