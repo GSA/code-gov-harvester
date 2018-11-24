@@ -13,7 +13,8 @@ class AbstractIndexer {
 
     this.adapter = new adapter({
       hosts: params.esHosts,
-      logger: ElasticsearchLogger
+      logger: ElasticsearchLogger,
+      apiVersion: params.esApiVersion
     });
 
     this.logger = new Logger({ name: this.LOGGER_NAME });

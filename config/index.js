@@ -126,6 +126,8 @@ function getConfig(env='development') {
   config.TERM_INDEX_CONFIG = getIndexConfig('term');
   config.STATUS_INDEX_CONFIG = getIndexConfig('status');
 
+  config.ELASTICSEARCH_API_VERSION = '5.6';
+
   Object.assign(config, getAppFilesDirectories());
 
   return config;
