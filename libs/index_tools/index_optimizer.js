@@ -17,9 +17,13 @@ class IndexOptimizer {
    * @param {string[]} hosts A list of Elasticsearch hosts
    * @param {object} logger A logger instance of Winston or Bunyan like loggers.
    */
-  constructor(adapter, hosts, logger=undefined) {
-    this.adapter = new adapter({ hosts, logger: ElasticsearchLogger });
-    this.logger = logger ? logger : new Logger({ name: 'index-optimizer'});
+  constructor({ adapter, config, logger=undefined }) {
+    this.adapter = new adapter({
+      hosts: config.ES_HOST,
+      logger: ElasticsearchLogger,
+      apiVersion: config.ELASTICSEARCH_API_VERSION
+    });
+    this.logger = logger ? logger : new Logger({ name: 'index-optimizer', level: config.LOGGER_LEVEL });
   }
 
   /**
@@ -50,9 +54,9 @@ class IndexOptimizer {
    * @param {object} config The current execution configuration.
    * @param {[object]} logger A Winston or Bunyan like logger instance. Defaults to undefined
    */
-  static async optimizeIndex(adapter, index, requestTimeout=30000, config, logger=undefined) {
+  static async optimizeIndex({ adapter, index, requestTimeout=30000, config, logger=undefined }) {
 
-    let optimizer = new IndexOptimizer(adapter, config.ES_HOST, logger);
+    let optimizer = new IndexOptimizer({ adapter, config, logger });
     optimizer.logger.info(`Starting index optimization.`);
     try {
       return await optimizer.forceMerge({
@@ -106,4 +110,6 @@ if(!require.main === 'module') {
   }
 }
 
-module.exports = IndexOptimizer;
+module.exports = {
+  IndexOptimizer
+};
