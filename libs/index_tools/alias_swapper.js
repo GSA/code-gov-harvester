@@ -19,7 +19,8 @@ class AliasSwapper {
   constructor({ adapter, config, logger }) {
     this.adapter = new adapter({
       hosts: config.ES_HOST,
-      logger: ElasticsearchLogger
+      logger: ElasticsearchLogger,
+      apiVersion: config.ELASTICSEARCH_API_VERSION
     });
     this.logger = logger;
   }
@@ -32,7 +33,9 @@ class AliasSwapper {
    */
   async aliasExists(name) {
     try {
-      return await this.adapter.aliasExists({ name });
+      return await this.adapter.aliasExists({
+        name: [name]
+      });
     } catch(error) {
       this.logger.trace(error);
       throw error;
@@ -109,17 +112,17 @@ class AliasSwapper {
    * @static
    * @param {object} params
    * @param {object} params.adapter The search adapter to use for making requests to ElasticSearch
-   * @param {string} params.targetIndex The index to swap the alias to.
+   * @param {string} params.index The index to swap the alias to.
    * @param {string} params.alias The alias to swap to the targetIndex.
    * @param {object} params.config Configuration object to be used.
    * @param {object} params.logger The logger to use with the AliasSwapper.
    * @returns {Promise}
    */
-  static async swapAlias({ adapter, targetIndex, alias, config, logger=undefined }) {
+  static async swapAlias({ adapter, index, alias, config, logger=undefined }) {
     const swapper = new AliasSwapper({
       adapter,
       config,
-      logger: logger ? logger : new Logger({ name: 'alias-swapper' })
+      logger: logger ? logger : new Logger({ name: 'alias-swapper', level: config.LOGGER_LEVEL })
     });
 
     swapper.logger.info(`Starting alias swapping.`);
@@ -130,7 +133,7 @@ class AliasSwapper {
       if(exists) {
         indices = await swapper.getIndexesForAlias(alias);
       }
-      let actions = swapper._buildActions({ indices, alias, targetIndex });
+      let actions = swapper._buildActions({ indices, alias, targetIndex: index });
 
       return await swapper.executeActions(actions);
 
@@ -165,4 +168,6 @@ if (require.main === module) {
   }
 }
 
-module.exports = AliasSwapper;
+module.exports = {
+  AliasSwapper
+};
