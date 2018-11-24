@@ -19,6 +19,12 @@
                 "status",
                 "0"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Index Terms",
+            "program": "${workspaceFolder}/scripts/index/term/index.js"
         }
     ]
 }
