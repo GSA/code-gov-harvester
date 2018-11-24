@@ -36,7 +36,11 @@ async function getRepos({from=0, size=100, collection=[], adapter, index}) {
   return await getRepos({ from, size, collection: collection.concat(normalizedData), adapter, index });
 }
 async function normalizeRepoScores({ adapter, index, type, config, log=undefined}) {
-  const elasticSearchAdapter = new adapter({ hosts: config.ES_HOST, logger: Logger });
+  const elasticSearchAdapter = new adapter({
+    hosts: config.ES_HOST,
+    logger: Logger,
+    apiVersion: config.ELASTICSEARCH_API_VERSION
+  });
   const logger = log
     ? log
     : new Logger({ name: 'data-score-normalizer', level: config.LOGGER_LEVEL });

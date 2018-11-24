@@ -11,7 +11,8 @@ class SearchStream extends Readable {
 
     this.client = new adapter({
       hosts: config.ES_HOST,
-      logger: ElasticsearchLogger
+      logger: ElasticsearchLogger,
+      apiVersion: config.ELASTICSEARCH_API_VERSION
     });
 
     this.searchQuery = searchQuery;

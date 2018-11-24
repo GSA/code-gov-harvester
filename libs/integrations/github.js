@@ -30,7 +30,11 @@ async function getRepos({from=0, size=100, collection=[], adapter}) {
 }
 
 async function getGithubData({ adapter, index, type, config, log=undefined }) {
-  const elasticSearchAdapter = new adapter({ hosts: config.ES_HOST, logger: Logger });
+  const elasticSearchAdapter = new adapter({
+    hosts: config.ES_HOST,
+    logger: Logger,
+    apiVersion: config.ELASTICSEARCH_API_VERSION
+  });
 
   const logger = log
     ? log

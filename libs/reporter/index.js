@@ -74,11 +74,12 @@ class Reporter {
 
   async indexReport() {
     const params = {
-      "esAlias": this.config.STATUS_INDEX_CONFIG.esAlias,
-      "esType": this.config.STATUS_INDEX_CONFIG.esType,
-      "esMapping": this.config.STATUS_INDEX_CONFIG.mappings,
-      "esSettings": this.config.STATUS_INDEX_CONFIG.settings,
-      "esHosts": this.config.ES_HOST
+      esAlias: this.config.STATUS_INDEX_CONFIG.esAlias,
+      esType: this.config.STATUS_INDEX_CONFIG.esType,
+      esMapping: this.config.STATUS_INDEX_CONFIG.mappings,
+      esSettings: this.config.STATUS_INDEX_CONFIG.settings,
+      esHosts: this.config.ES_HOST,
+      esApiVersion: config.ELASTICSEARCH_API_VERSION
     };
     const adapter = adapters.elasticsearch.ElasticsearchAdapter;
     try {
