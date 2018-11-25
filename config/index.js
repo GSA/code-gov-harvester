@@ -51,10 +51,10 @@ function getElasticsearchUri(cloudFoundryEnv) {
  * Get the necessary application directories.
  * @returns {object} - Directory paths needed by the application
  */
-function getAppFilesDirectories() {
+function getAppFilesDirectories(getRemoteMetadata=false) {
   let filePath;
 
-  if(process.env.GET_REMOTE_METADATA && process.env.REMOTE_METADATA_LOCATION) {
+  if(getRemoteMetadata) {
     filePath = process.env.REMOTE_METADATA_LOCATION;
   } else {
     filePath = process.env.NODE_ENV === 'testing'
@@ -128,7 +128,11 @@ function getConfig(env='development') {
 
   config.ELASTICSEARCH_API_VERSION = '5.6';
 
-  Object.assign(config, getAppFilesDirectories());
+  config.GET_REMOTE_METADATA = process.env.GET_REMOTE_METADATA
+    && process.env.GET_REMOTE_METADATA === 'true'
+    && process.env.REMOTE_METADATA_LOCATION;
+
+  Object.assign(config, getAppFilesDirectories(config.GET_REMOTE_METADATA));
 
   return config;
 }
