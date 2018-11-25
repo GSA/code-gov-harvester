@@ -22,10 +22,10 @@ class RepoIndexer extends AbstractIndexer {
 
   }
 
-  async getMetadata() {
+  async getMetadata(config) {
     let response;
 
-    if(process.env.GET_REMOTE_METADATA) {
+    if(config.GET_REMOTE_METADATA) {
       response = await fetch(this.agencyEndpointsFile);
       return response.body;
     }
@@ -35,7 +35,7 @@ class RepoIndexer extends AbstractIndexer {
 
   async indexRepos(config) {
 
-    const agencyEndpointsStream = await this.getMetadata();
+    const agencyEndpointsStream = await this.getMetadata(config);
     const jsonStream = JSONStream.parse("*");
     const agencyJsonStream = new AgencyJsonStream(this.fetchedFilesDir, this.fallbackFilesDir, config);
     const indexerStream = new RepoIndexerStream(this, config);
@@ -91,7 +91,7 @@ class RepoIndexer extends AbstractIndexer {
       await repoIndexer.indexRepos(config);
       await Reporter.indexReport(config);
 
-      repoIndexer.logger.info(`Finished indexing (${repoIndexer.esType}) indices.`);
+      repoIndexer.logger.info(`Finished indexing (${repoIndexer.esType}).`);
       return {
         esAlias: repoIndexer.esAlias,
         esIndex: repoIndexer.esIndex,
