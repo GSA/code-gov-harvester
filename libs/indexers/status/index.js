@@ -1,15 +1,15 @@
 const { AbstractIndexer } = require("../../index_tools");
 const crypto = require("crypto");
-const Logger = require('../../loggers');
+const { Logger } = require('../../loggers');
 
 class StatusIndexer extends AbstractIndexer {
   get LOGGER_NAME() {
     return 'status-indexer';
   }
 
-  constructor(adapter, params) {
+  constructor(adapter, params, config) {
     super(adapter, params);
-    this.logger = new Logger( { name: this.LOGGER_NAME });
+    this.logger = new Logger( { name: this.LOGGER_NAME, level: config.LOGGER_LEVEL });
   }
 
   indexStatus (reporter) {
@@ -26,26 +26,26 @@ class StatusIndexer extends AbstractIndexer {
     });
   }
 
-  static init(reporter, adapter, esParams) {
-    const indexer = new StatusIndexer(adapter, esParams);
+  static async init(reporter, adapter, esParams, config) {
+    const indexer = new StatusIndexer(adapter, esParams, config);
 
     indexer.logger.info(`Started indexing (${indexer.esType}) indices.`);
-    return indexer.indexExists()
-      .then(exists => {
-        if(exists) {
-          indexer.deleteIndex();
-        }
-      })
-      .then(() => indexer.initIndex())
-      .then(() => indexer.initMapping())
-      .then(() => indexer.indexStatus(reporter))
-      .then(() => {
-        return { esIndex: indexer.esIndex, esAlias: indexer.esAlias };
-      })
-      .catch(error => {
-        indexer.logger.error(error);
-        throw error;
-      });
+
+    try {
+      const exists = await indexer.indexExists();
+
+      if(exists) {
+        indexer.deleteIndex();
+      }
+      const indexInfo = await indexer.initIndex();
+      await indexer.initMapping();
+      await indexer.indexStatus(reporter);
+
+      return { esIndex: indexInfo.index, esAlias: indexer.esAlias };
+    } catch(error) {
+      indexer.logger.error(error);
+      throw error;
+    }
   }
 }
 
