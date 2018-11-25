@@ -37,9 +37,23 @@ class Indexer {
 
     try {
       const repoIndexInfo = await RepoIndexer.init(this.elasticsearchAdapter, this.config);
-      await IndexOptimizer.init(this.elasticsearchAdapter, repoIndexInfo, this.config);
-      await AliasSwapper.init(this.elasticsearchAdapter, repoIndexInfo, this.config);
-      await IndexCleaner.init(this.elasticsearchAdapter, repoIndexInfo.esAlias, DAYS_TO_KEEP, this.config);
+      await IndexOptimizer.optimizeIndex({
+        adapter: this.elasticsearchAdapter,
+        index: repoIndexInfo.esIndex,
+        config: this.config
+      });
+      await AliasSwapper.swapAlias({
+        adapter: this.elasticsearchAdapter,
+        index: repoIndexInfo.esIndex,
+        alias: repoIndexInfo.esAlias,
+        config: this.config
+      });
+      await IndexCleaner.cleanIndexes({
+        adapter: this.elasticsearchAdapter,
+        alias: repoIndexInfo.esAlias,
+        dayToKeep: DAYS_TO_KEEP,
+        config: this.config
+      });
 
       this.logger.debug(`Finished indexing repos`);
       return repoIndexInfo;
