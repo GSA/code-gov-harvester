@@ -4,8 +4,14 @@
   "description": "Code.gov code.json harvester and data manipulation tool",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha --reporter xunit tests",
-    "lint": "eslint ."
+    "debug": "node --inspect ./scripts/index/index.js",
+    "start": "node ./scripts/index/index.js",
+    "index-repos": "node ./scripts/index/repo/index.js",
+    "index-terms": "node ./scripts/index/term/index.js",
+    "security-check": "npm audit",
+    "test": "./node_modules/.bin/nyc mocha --reporter xunit tests",
+    "lint": "./node_modules/.bin/eslint .",
+    "lint-fix": "./node_modules/.bin/eslint --fix ."
   },
   "repository": {
     "type": "git",
