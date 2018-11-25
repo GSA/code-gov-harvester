@@ -24,7 +24,15 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Index Terms",
+            "outputCapture": "std",
             "program": "${workspaceFolder}/scripts/index/term/index.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Index Repos",
+            "outputCapture": "std",
+            "program": "${workspaceFolder}/scripts/index/repo/index.js"
         }
     ]
 }
