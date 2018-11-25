@@ -79,15 +79,32 @@ class Reporter {
       esMapping: this.config.STATUS_INDEX_CONFIG.mappings,
       esSettings: this.config.STATUS_INDEX_CONFIG.settings,
       esHosts: this.config.ES_HOST,
-      esApiVersion: config.ELASTICSEARCH_API_VERSION
+      esApiVersion: this.config.ELASTICSEARCH_API_VERSION
     };
     const adapter = adapters.elasticsearch.ElasticsearchAdapter;
     try {
-      const indexInfo = await StatusIndexer.init(this, adapter, params);
-      await IndexOptimizer.init(adapter, indexInfo, this.config);
-      await AliasSwapper.init(adapter, indexInfo, this.config);
-      await IndexCleaner.init(adapter, indexInfo.esAlias, DAYS_TO_KEEP, this.config);
+      const indexInfo = await StatusIndexer.init(this, adapter, params, this.config);
+
+      await IndexOptimizer.optimizeIndex({
+        adapter,
+        index: indexInfo.esIndex,
+        config:this.config
+      });
+      await AliasSwapper.swapAlias({
+        adapter,
+        index: indexInfo.esIndex,
+        alias: indexInfo.esAlias,
+        config: this.config
+      });
+      await IndexCleaner.cleanIndexes({
+        adapter,
+        alias: indexInfo.esAlias,
+        dayToKeep: DAYS_TO_KEEP,
+        config: this.config
+      });
+
       return indexInfo;
+
     } catch(error) {
       this.logger.error(error);
       throw error;
@@ -109,4 +126,4 @@ class Reporter {
   }
 }
 
-module.exports = new Reporter(getConfig(process.env.NODE_ENV), { name: "reporter" });
+module.exports = new Reporter(getConfig(process.env.NODE_ENV), "reporter" );
