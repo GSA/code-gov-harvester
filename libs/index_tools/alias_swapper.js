@@ -22,7 +22,7 @@ class AliasSwapper {
       logger: ElasticsearchLogger,
       apiVersion: config.ELASTICSEARCH_API_VERSION
     });
-    this.logger = logger;
+    this.logger = logger ? logger : new Logger({ name: 'alias-swapper', level: config.LOGGER_LEVEL });
   }
 
   /**
@@ -119,14 +119,12 @@ class AliasSwapper {
    * @returns {Promise}
    */
   static async swapAlias({ adapter, index, alias, config, logger=undefined }) {
-    const swapper = new AliasSwapper({
-      adapter,
-      config,
-      logger: logger ? logger : new Logger({ name: 'alias-swapper', level: config.LOGGER_LEVEL })
-    });
-
-    swapper.logger.info(`Starting alias swapping.`);
     try {
+
+      const swapper = new AliasSwapper({ adapter, config, logger });
+
+      swapper.logger.info(`Starting alias swapping.`);
+
       const exists = await swapper.aliasExists(alias);
       let indices = [];
 
