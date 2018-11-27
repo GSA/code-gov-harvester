@@ -10,7 +10,7 @@
     "index-terms": "node ./scripts/index/term/index.js",
     "index-issues": "node ./scripts/index/issues/index.js",
     "security-check": "npm audit",
-    "test": "./node_modules/.bin/nyc mocha --reporter xunit tests",
+    "test": "./node_modules/.bin/nyc mocha --opts tests/mocha.opts tests",
     "lint": "./node_modules/.bin/eslint .",
     "lint-fix": "./node_modules/.bin/eslint --fix ."
   },
@@ -36,8 +36,11 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^5.8.0",
+    "eslint-plugin-mocha": "^5.2.0",
     "mocha": "^5.2.0",
-    "nock": "^10.0.2"
+    "mocha-junit-reporter": "^1.18.0",
+    "nock": "^10.0.2",
+    "nyc": "^13.1.0"
   },
   "dependencies": {
     "@code.gov/code-gov-adapter": "^1.1.5",
