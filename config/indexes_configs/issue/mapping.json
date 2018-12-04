@@ -1,0 +1,59 @@
+{
+  "issue": {
+    "properties": {
+      "issueId": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "repoId": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "url": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "state": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "updated_at": {
+        "type": "date"
+      },
+      "merged_at": {
+        "type": "date"
+      },
+      "created_at": {
+        "type": "date"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "englishfulltext",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          }
+        }
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "englishfulltext"
+      },
+      "body": {
+        "type": "text",
+        "analyzer": "englishfulltext"
+      },
+      "labels": {
+        "type": "text",
+        "analyzer": "englishfulltext",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          }
+        }
+      }
+    }
+  }
+}
