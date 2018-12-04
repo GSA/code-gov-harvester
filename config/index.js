@@ -11,7 +11,7 @@ const Jsonfile = require('jsonfile');
  * @returns {object} Object with index mappings and settings.
  */
 function getIndexConfig(index) {
-  if(['repo', 'status', 'term'].includes(index)) {
+  if(['repo', 'status', 'term', 'issue'].includes(index)) {
     const mappings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/mapping.json`));
     const settings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/settings.json`));
     const esAlias = index === 'status' ? index : `${index}s`;
@@ -125,6 +125,7 @@ function getConfig(env='development') {
   config.REPO_INDEX_CONFIG = getIndexConfig('repo');
   config.TERM_INDEX_CONFIG = getIndexConfig('term');
   config.STATUS_INDEX_CONFIG = getIndexConfig('status');
+  config.ISSUE_INDEX_CONFIG = getIndexConfig('issue');
 
   config.ELASTICSEARCH_API_VERSION = '5.6';
 
