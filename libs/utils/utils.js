@@ -4,8 +4,10 @@ const latinize = require("latinize");
 class Utils {
 
   /**
-   * Transform passed string into RepoId
+   * Transform passed string into a string to be used as an ID.
+   *
    * @param {string} text
+   * @returns {string} Latinized version of the supplied string.
    */
   static transformStringToKey(text) {
     return latinize(text)
