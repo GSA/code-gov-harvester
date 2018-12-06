@@ -53,6 +53,32 @@
             "normalizer": "lowercase"
           }
         }
+      },
+      "repositoryURL": {
+        "type": "keyword"
+      },
+      "agencyName": {
+        "type": "text",
+        "analyzer": "englishfulltext",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          }
+        }
+      },
+      "agencyAcronym": {
+        "type": "keyword",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          }
+        }
+      },
+      "agencyWebsite": {
+        "type": "keyword",
+        "normalizer": "lowercase"
       }
     }
   }
