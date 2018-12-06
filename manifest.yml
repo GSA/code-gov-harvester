@@ -1,0 +1,23 @@
+applications:
+- name: code-gov-harvester
+  memory: 512M
+  instances: 1
+  disk_quota: 1024M
+  health-check-type: process
+  buildpack: https://github.com/cloudfoundry/nodejs-buildpack
+  env:
+    ES_HEAP_SIZE: 10g
+    CF_STAGING_TIMEOUT: 15
+    CF_STARTUP_TIMEOUT: 15
+    LOGGER_LEVEL: info
+    GITHUB_TOKEN: not-a-token
+    GITHUB_AUTH_TYPE: token
+    GET_REMOTE_METADATA: true
+    REMOTE_METADATA_LOCATION: https://raw.githubusercontent.com/GSA/code-gov-data/master/agency_metadata.json
+    GET_GITHUB_DATA: true
+    ELASTICSEARCH_SERVICE_NAME: code_gov_elasticsearch
+    NODE_ENV: production
+  services:
+  - code_gov_elasticsearch
+  stack: cflinuxfs2
+  command: npm start
