@@ -3,6 +3,8 @@ const crypto = require("crypto");
 const { Logger } = require('../../loggers');
 const { getClient, getCodeGovRepos, getRepoIssues } = require('../../integrations/github')
 const { Utils } = require('../../utils');
+const fs = require('fs');
+const Json2csvParser = require('json2csv').Parser;
 
 class IssuesIndexer extends AbstractIndexer {
   get LOGGER_NAME() {
@@ -15,9 +17,8 @@ class IssuesIndexer extends AbstractIndexer {
     this.client = getClient();
   }
 
-  async indexIssue (issue, codeGovRepoId) {
+  async indexIssue (issue) {
     const id = Utils.transformStringToKey(issue.title)
-    issue.repoId = codeGovRepoId;
 
     return await this.indexDocument({
       index: this.esIndex,
@@ -27,17 +28,56 @@ class IssuesIndexer extends AbstractIndexer {
     });
   }
 
+  async writeToFile(data, fileName) {
+    const fields = [
+      'issueId', 'repoId', 'url', 'state', 'updated_at', 'merged_at', 'created_at', 'title',
+      'description','body','labels','repositoryURL','agencyName','agencyAcronym', 'agencyWebsite'
+    ]
+    let csv;
+
+    try {
+      const parser = new Json2csvParser({ fields });
+      csv = parser.parse(data);
+    } catch (err) {
+      console.error(err);
+    }
+
+    fs.writeFile(fileName,csv, { flag: 'a' }, error => {
+      if(error) this.logger.error(error);
+    });
+  }
+  formatIssue(issue, codeGovRepoId, agency, repositoryURL) {
+    issue.repoId = codeGovRepoId;
+    issue.issueId = Utils.transformStringToKey(issue.title);
+    issue.agencyName = agency.name;
+    issue.agencyAcronym = agency.acronym;
+    issue.repositoryURL = repositoryURL;
+
+    return issue;
+  }
   async indexIssues() {
     const codeGovRepos = await getCodeGovRepos(this.adapter);
+    const outputFileName = `./issues-${new Date().toISOString()}.csv`;
 
-    for(const { owner, repo, codeGovRepoId } of codeGovRepos) {
-      const { issues, error } = await getRepoIssues({ owner, repo, client: this.client });
+    for(const { owner, repo, codeGovRepoId, agency, repositoryURL } of codeGovRepos) {
+      let { issues, error } = await getRepoIssues({ owner, repo, client: this.client });
 
       if(Object.keys(error).length) {
-        this.logger.error(error)
+        this.logger.error(error);
       }
 
-      issues.forEach(async issue => await this.indexIssue(issue, codeGovRepoId));
+      if(issues.length) {
+        issues = issues.map(issue => this.formatIssue(issue, codeGovRepoId, agency, repositoryURL));
+
+        this.writeToFile(issues, outputFileName);
+        issues.forEach(async issue => {
+          try{
+            await this.indexIssue(issue);
+          }catch(error) {
+            this.logger.error(error);
+          }
+        });
+      }
     }
   }
 
