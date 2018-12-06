@@ -1,6 +1,7 @@
 const getConfig = require('../../config');
 const RepoIndexer = require("./repo");
 const TermIndexer = require("./term");
+const IssueIndexer = require('./issues');
 const { Logger } = require("../../libs/loggers");
 
 /**
@@ -22,32 +23,34 @@ class Indexer {
   async index() {
     let repoIndexer = new RepoIndexer(this.config);
     let termIndexer = new TermIndexer(this.config);
+    let issueIndexer = new IssueIndexer(this.config)
 
     try {
       await repoIndexer.index();
       await termIndexer.index();
+      await issueIndexer.index();
     } catch(error) {
-      this.logger.trace(error);
+      this.logger.error(error);
       throw error;
     }
   }
 
-  schedule(delayInSeconds) {
-    setInterval(this.index, delayInSeconds * 1000,
-      (err) => {
-        if (err) {
-          this.logger.error(err);
-        }
-      });
+  schedule(timeInterval) {
+    setInterval(this.index, delayInSeconds * 1000);
   }
 }
 
 if (require.main === module) {
   const config = getConfig(process.env.NODE_ENV);
   let indexer = new Indexer(config);
-  indexer.index()
-    .then(() => indexer.logger.info('Indexing process complete'))
-    .catch(error => indexer.logger.error(error));
+
+  if(process.env.INDEX_INTERVAL) {
+    indexer.schedule(process.env.INDEX_INTERVAL)
+  } else {
+    indexer.index()
+      .then(() => indexer.logger.info('Indexing process complete'))
+      .catch(error => indexer.logger.error(error));
+  }
 }
 
 module.exports = Indexer;
