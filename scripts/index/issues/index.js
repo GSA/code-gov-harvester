@@ -36,27 +36,27 @@ class Indexer {
     this.logger.info('Started indexing.');
 
     try {
-      const repoIndexInfo = await IssuesIndexer.init(this.elasticsearchAdapter, this.config);
+      const issueIndexInfo = await IssuesIndexer.init(this.elasticsearchAdapter, this.config);
       await IndexOptimizer.optimizeIndex({
         adapter: this.elasticsearchAdapter,
-        index: repoIndexInfo.esIndex,
+        index: issueIndexInfo.esIndex,
         config: this.config
       });
       await AliasSwapper.swapAlias({
         adapter: this.elasticsearchAdapter,
-        index: repoIndexInfo.esIndex,
-        alias: repoIndexInfo.esAlias,
+        index: issueIndexInfo.esIndex,
+        alias: issueIndexInfo.esAlias,
         config: this.config
       });
       await IndexCleaner.cleanIndexes({
         adapter: this.elasticsearchAdapter,
-        alias: repoIndexInfo.esAlias,
+        alias: issueIndexInfo.esAlias,
         dayToKeep: DAYS_TO_KEEP,
         config: this.config
       });
 
       this.logger.debug(`Finished indexing repos`);
-      return repoIndexInfo;
+      return issueIndexInfo;
     } catch(error) {
       this.logger.trace(error);
       throw error;
