@@ -27,9 +27,9 @@ function getBody(from, size) {
 async function getRepos({from=0, size=100, collection=[], adapter}) {
   let body = getBody(from, size);
 
-  logger.info(`Fetching repositories from Code.gov. Page: ${from}`);
+  logger.info(`Fetching repositories from Code.gov. Page: ${from/size}`);
   const {total, data} = await adapter.search({ index: 'repos', type: 'repo', body});
-  logger.info(`Fetched ${total} repositories from Code.gov.`);
+  logger.info(`Fetched ${from + size} repositories from Code.gov.`);
   const delta = total - from;
 
   if(delta < size) {
@@ -42,13 +42,27 @@ async function getRepos({from=0, size=100, collection=[], adapter}) {
 
 async function getCodeGovRepos(adapter) {
   const {total, data} = await getRepos({ adapter });
-  const codeGovRepos = data.filter(repo => repo.repositoryURL && Utils.isGithubUrl(repo.repositoryURL))
+  const codeGovRepos = data.filter(repo => {
+    return repo.permissions.usageType === 'openSource' && repo.repositoryURL && Utils.isGithubUrl(repo.repositoryURL)
+  });
 
-  logger.info('Filetering Code.gov repos to only those on Github.')
+  logger.info('Filtering Code.gov repos to only those on Github.')
   return codeGovRepos.map(codeGovRepo => {
     const {owner, repo} = Utils.parseGithubUrl(codeGovRepo.repositoryURL);
 
-    return { owner, repo , codeGovRepoId: codeGovRepo.repoID };
+    agency = {
+      name: codeGovRepo.agency.name,
+      acronym: codeGovRepo.agency.acronym,
+      website: codeGovRepo.agency.website
+    }
+
+    return {
+      owner,
+      repo ,
+      agency,
+      codeGovRepoId: codeGovRepo.repoID,
+      repositoryURL: codeGovRepo.repositoryURL
+     };
   });
 }
 
