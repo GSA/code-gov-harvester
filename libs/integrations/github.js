@@ -42,9 +42,10 @@ async function getRepos({from=0, size=100, collection=[], adapter}) {
 
 async function getCodeGovRepos(adapter) {
   const {total, data} = await getRepos({ adapter });
-  const codeGovRepos = data.filter(repo => {
-    return repo.permissions.usageType === 'openSource' && repo.repositoryURL && Utils.isGithubUrl(repo.repositoryURL)
-  });
+  const codeGovRepos = data.filter(repo => repo.permissions.usageType === 'openSource'
+      && repo.repositoryURL
+      && Utils.isValidRepositoryUrl(repo.repositoryURL)
+  );
 
   logger.info('Filtering Code.gov repos to only those on Github.')
   return codeGovRepos.map(codeGovRepo => {
@@ -68,7 +69,7 @@ async function getCodeGovRepos(adapter) {
 
 async function getRepoIssues({ owner, repo, client }) {
   try {
-    return await integrations.github.getRepoIssues({owner, repo, client});
+    return await integrations.github.getRepoIssues({owner, repo, labels: 'code.gov', client});
   } catch(error) {
     throw error;
   }
