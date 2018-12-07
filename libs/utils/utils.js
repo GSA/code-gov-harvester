@@ -267,8 +267,8 @@ class Utils {
     };
   }
 
-  static isGithubUrl (repoUrl) {
-    const githubUrlRegEx = /github.com/;
+  static isValidRepositoryUrl (repoUrl) {
+    const githubUrlRegEx = /(https|http):\/\/(www\.)?github.com\/[^\/]+\/[^\/]+$/g;
     if (repoUrl) {
       const match = repoUrl.match(githubUrlRegEx);
 
