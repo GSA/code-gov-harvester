@@ -167,3 +167,4 @@ $RECYCLE.BIN/
 data/**/*.json
 test-results/
 .vscode
+*.csv
