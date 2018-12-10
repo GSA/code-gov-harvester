@@ -268,7 +268,7 @@ class Utils {
   }
 
   static isValidRepositoryUrl (repoUrl) {
-    const githubUrlRegEx = /(https|http):\/\/(www\.)?github.com\/[^\/]+\/[^\/]+$/g;
+    const githubUrlRegEx = /(https|http|git):\/\/(www\.)?github.com\/[^\/]+\/[^\/]+(.git)?$/g;
     if (repoUrl) {
       const match = repoUrl.match(githubUrlRegEx);
 
@@ -278,6 +278,15 @@ class Utils {
     }
 
     return false;
+  }
+
+  static stripBom(input) {
+    const inputString = input.toString();
+
+    if(inputString.charCodeAt(0) === 0xFEFF) {
+      return inputString.slice(1);
+    }
+    return inputString;
   }
 }
 
