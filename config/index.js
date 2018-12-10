@@ -133,6 +133,16 @@ function getConfig(env='development') {
     && process.env.GET_REMOTE_METADATA === 'true'
     && process.env.REMOTE_METADATA_LOCATION;
 
+  // Used for our cron schedule.
+  config.TIME_ZONE = process.env.TIME_ZONE || 'America/New_York';
+
+  // These are Unix cron syntax. For more information please take a look at:
+  // https://www.npmjs.com/package/node-cron or https://en.wikipedia.org/wiki/Cron#Overview
+  // Repos are set to a default of once a day at 5pm
+  // Issues are set to run every 3 hours
+  config.REPOS_INDEX_CRON_CONFIG = process.env.REPOS_INDEX_CRON_CONFIG || '0 17 * * *';
+  config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '* */3 * * *';
+
   Object.assign(config, getAppFilesDirectories(config.GET_REMOTE_METADATA));
 
   return config;
