@@ -3,6 +3,7 @@ const RepoIndexer = require("./repo");
 const TermIndexer = require("./term");
 const IssueIndexer = require('./issues');
 const { Logger } = require("../../libs/loggers");
+const cron = require('node-cron');
 
 /**
  * Defines the class responsible for creating and managing the elasticsearch indexes
@@ -20,14 +21,22 @@ class Indexer {
     this.config = config;
   }
 
-  async index() {
+  async indexRepos() {
     let repoIndexer = new RepoIndexer(this.config);
     let termIndexer = new TermIndexer(this.config);
-    let issueIndexer = new IssueIndexer(this.config)
 
     try {
       await repoIndexer.index();
       await termIndexer.index();
+    } catch(error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+  async indexIssues() {
+    let issueIndexer = new IssueIndexer(this.config)
+
+    try {
       await issueIndexer.index();
     } catch(error) {
       this.logger.error(error);
@@ -35,22 +44,37 @@ class Indexer {
     }
   }
 
-  schedule(timeInterval) {
-    setInterval(this.index, delayInSeconds * 1000);
+  schedule({ jobName, cronConfig, scheduleParameters, targetFunction }) {
+    return cron.schedule(cronConfig, () => {
+      this.logger.info(`Executing job: ${jobName}`)
+      targetFunction()
+        .then(() => {
+          this.logger.info(`Finished job: ${jobName}.`);
+        })
+        .catch(error => {
+          this.logger.error(`[ERROR] job: ${jobName} - `, error)
+        });
+    }, scheduleParameters);
   }
 }
 
 if (require.main === module) {
   const config = getConfig(process.env.NODE_ENV);
   let indexer = new Indexer(config);
+  const scheduleParameters = { scheduled: true, timezone: config.TIME_ZONE };
 
-  if(process.env.INDEX_INTERVAL) {
-    indexer.schedule(process.env.INDEX_INTERVAL)
-  } else {
-    indexer.index()
-      .then(() => indexer.logger.info('Indexing process complete'))
-      .catch(error => indexer.logger.error(error));
-  }
+  indexer.schedule({
+    jobName: `index-repos`,
+    cronConfig: config.REPOS_INDEX_CRON_CONFIG,
+    scheduleParameters,
+    targetFunction: indexer.indexRepos.bind(indexer)
+  });
+  indexer.schedule({
+    jobName: `index-issues`,
+    cronConfig: config.ISSUE_INDEX_CRON_CONFIG,
+    scheduleParameters,
+    targetFunction: indexer.indexIssues.bind(indexer)
+  });
 }
 
 module.exports = Indexer;
