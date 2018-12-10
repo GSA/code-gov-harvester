@@ -78,15 +78,9 @@ class AgencyJsonStream extends Transform {
         return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
       }
 
-      let jsonData = {};
       try {
-
         const responseBuffer = await response.buffer();
-        if(responseBuffer.indexOf('\uFEFF', 0, 'utf16le') === 0) {
-          jsonData = JSON.parse(encoding.convert(responseBuffer, 'utf8', 'utf16le'));
-        } else {
-          jsonData = JSON.parse(responseBuffer.toString());
-        }
+        const jsonData = JSON.parse(Utils.stripBom(responseBuffer));
 
         this._saveFetchedCodeJson(agency.acronym, jsonData);
 
