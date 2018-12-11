@@ -52,7 +52,7 @@ class Indexer {
           this.logger.info(`Finished job: ${jobName}.`);
         })
         .catch(error => {
-          this.logger.error(`[ERROR] job: ${jobName} - `, error)
+          this.logger.error(`[ERROR] job: ${jobName} - ${error}`)
         });
     }, scheduleParameters);
   }
