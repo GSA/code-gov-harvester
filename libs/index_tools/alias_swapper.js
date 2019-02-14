@@ -127,7 +127,7 @@ class AliasSwapper {
 
     swapper.logger.info(`Starting alias swapping.`);
     try {
-      const exists = await swapper.aliasExists({ name: alias });
+      const exists = await swapper.aliasExists(alias);
       let indices = [];
 
       if(exists) {

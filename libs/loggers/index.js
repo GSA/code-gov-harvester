@@ -20,7 +20,7 @@ class Logger {
           ? process.env.LOGGER_LEVEL
           : this.level,
       format: combine(
-        label({ loggerName: name ? name : this.label }),
+        label({ label: name ? name : this.label }),
         timestamp(),
         json()
       ),

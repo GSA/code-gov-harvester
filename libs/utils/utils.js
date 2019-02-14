@@ -4,8 +4,10 @@ const latinize = require("latinize");
 class Utils {
 
   /**
-   * Transform passed string into RepoId
+   * Transform passed string into a string to be used as an ID.
+   *
    * @param {string} text
+   * @returns {string} Latinized version of the supplied string.
    */
   static transformStringToKey(text) {
     return latinize(text)
@@ -265,8 +267,8 @@ class Utils {
     };
   }
 
-  static isGithubUrl (repoUrl) {
-    const githubUrlRegEx = /github.com/;
+  static isValidRepositoryUrl (repoUrl) {
+    const githubUrlRegEx = /(https|http|git):\/\/(www\.)?github.com\/[^\/]+\/[^\/]+(.git)?$/g;
     if (repoUrl) {
       const match = repoUrl.match(githubUrlRegEx);
 
@@ -276,6 +278,15 @@ class Utils {
     }
 
     return false;
+  }
+
+  static stripBom(input) {
+    const inputString = input.toString();
+
+    if(inputString.charCodeAt(0) === 0xFEFF) {
+      return inputString.slice(1);
+    }
+    return inputString;
   }
 }
 
