@@ -1,0 +1,10 @@
+{
+    "openSource": "os",
+    "governmentWideReuse": "gwr",
+    "exemptByLaw": "xl",
+    "exemptByNationalSecurity": "xns",
+    "exemptByAgencySystem": "xas",
+    "exemptByAgencyMission": "xam",
+    "exemptByCIO": "xcio",
+    "exemptByPolicyDate": "xpd"
+}

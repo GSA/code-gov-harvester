@@ -9,6 +9,8 @@ class Formatter {
   constructor(config) {
     this.logger = new Logger({ name: "formatter", level: config.LOGGER_LEVEL });
     this.config = config;
+    this.exemptionsTexts = JsonFile.readFileSync(path.join(__dirname, './repo_upgrade_texts.json'));
+    this.exemptionsCodes = JsonFile.readFileSync(path.join(__dirname, './repo_codes.json'));
   }
 
   _formatDate(date) {
@@ -33,7 +35,7 @@ class Formatter {
   }
 
   _getUsageTypeExemptionText(repo) {
-    const exemptionTexts = JsonFile.readFileSync(path.join(__dirname, './repo_upgrade_texts.json'));
+    const exemptionTexts = this.exemptionsTexts;
     let usageType, exemptionText;
 
     if (repo.openSourceProject === 1) {
@@ -63,8 +65,8 @@ class Formatter {
     }
 
     return {usageType, exemptionText};
-
   }
+
   _upgradeOptionalFields(repo) {
     repo.vcs = repo.vcs || '';
     repo.disclaimerText = repo.disclaimerText || '';
@@ -140,11 +142,16 @@ class Formatter {
     return repo;
   }
 
+  _getUsageCode(repo) {
+    const { usageType } = repo.permissions ? repo.permissions : {"usageType": null};
+    return (usageType && this.exemptionsCodes[usageType]) ? this.exemptionsCodes[usageType] : "zzz";
+  }
+
   _formatRepo(repo){
-    // add repoId using a combination of agency acronym, organization, and
+    // add repoId using a combination of agency acronym, organization, usage Type and
     // repo name fields
     let repoId = Utils.transformStringToKey(
-      [repo.agency.acronym, repo.organization, repo.name].join("_")
+      [repo.agency.acronym, repo.organization, this._getUsageCode(repo), repo.name].join("_")
     );
     repo["repoID"] = repoId;
 
