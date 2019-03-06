@@ -144,7 +144,7 @@ class Formatter {
 
   _getUsageCode(repo) {
     const { usageType } = repo.permissions ? repo.permissions : {"usageType": null};
-    return (usageType && this.exemptionsCodes[usageType]) ? this.exemptionsCodes[usageType] : "zzz";
+    return (usageType && this.exemptionsCodes[usageType]) ? this.exemptionsCodes[usageType] : this.exemptionsCodes["other"];
   }
 
   _formatRepo(repo){

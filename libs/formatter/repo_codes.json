@@ -6,5 +6,6 @@
     "exemptByAgencySystem": "xas",
     "exemptByAgencyMission": "xam",
     "exemptByCIO": "xcio",
-    "exemptByPolicyDate": "xpd"
+    "exemptByPolicyDate": "xpd",
+    "other": "zzz"
 }
