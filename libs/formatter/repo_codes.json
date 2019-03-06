@@ -1,11 +1,11 @@
 {
-    "openSource": "os",
-    "governmentWideReuse": "gwr",
-    "exemptByLaw": "xl",
-    "exemptByNationalSecurity": "xns",
-    "exemptByAgencySystem": "xas",
-    "exemptByAgencyMission": "xam",
-    "exemptByCIO": "xcio",
-    "exemptByPolicyDate": "xpd",
-    "other": "zzz"
+    "openSource": "1",
+    "governmentWideReuse": "2",
+    "exemptByLaw": "3",
+    "exemptByNationalSecurity": "4",
+    "exemptByAgencySystem": "5",
+    "exemptByAgencyMission": "6",
+    "exemptByCIO": "7",
+    "exemptByPolicyDate": "8",
+    "other": "99"
 }
