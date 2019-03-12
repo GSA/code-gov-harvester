@@ -23,10 +23,18 @@ class Indexer {
 
   async indexRepos() {
     let repoIndexer = new RepoIndexer(this.config);
-    let termIndexer = new TermIndexer(this.config);
 
     try {
       await repoIndexer.index();
+    } catch(error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
+  async indexTerms() {
+    let termIndexer = new TermIndexer(this.config);
+
+    try {
       await termIndexer.index();
     } catch(error) {
       this.logger.error(error);
@@ -68,6 +76,12 @@ if (require.main === module) {
     cronConfig: config.REPOS_INDEX_CRON_CONFIG,
     scheduleParameters,
     targetFunction: indexer.indexRepos.bind(indexer)
+  });
+  indexer.schedule({
+    jobName: `index-terms`,
+    cronConfig: config.TERMS_INDEX_CRON_CONFIG,
+    scheduleParameters,
+    targetFunction: indexer.indexTerms.bind(indexer)
   });
   indexer.schedule({
     jobName: `index-issues`,
