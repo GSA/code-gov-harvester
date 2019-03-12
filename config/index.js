@@ -141,6 +141,7 @@ function getConfig(env='development') {
   // Repos are set to a default of once a day at 5pm
   // Issues are set to run every 3 hours
   config.REPOS_INDEX_CRON_CONFIG = process.env.REPOS_INDEX_CRON_CONFIG || '0 17 * * *';
+  config.REPOS_INDEX_CRON_CONFIG = process.env.TERMS_INDEX_CRON_CONFIG || '0 18 * * *';
   config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 */3 * * *';
 
   Object.assign(config, getAppFilesDirectories(config.GET_REMOTE_METADATA));
