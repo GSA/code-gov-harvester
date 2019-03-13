@@ -25,11 +25,10 @@ cd code-gov-harvester && npm install
 #### Environment Variables
 
 Before running any of the commands included in the package.json file there are some environment variables that need to be set:
-* NODE_ENV: The node environment the project is running under.
-Valid environments are:
-**prodcution or prod
-**staging or stag
-**development or dev
+* NODE_ENV: The node environment the project is running under. Valid environments are:
+  * `production` or `prod`
+  * `staging` or `stag`
+  * `development` or `dev`
 #### Metadata Files
 
 #### Scripts
