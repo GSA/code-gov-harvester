@@ -55,6 +55,10 @@ class AgencyJsonStream extends Transform {
 
   async _getAgencyCodeJson(agency){
     this.logger.info(`Entered _getAgencyCodeJson - Agency: ${agency.acronym}`);
+    
+    Reporter.reportFallbackUsed(agency.acronym, false);
+    Reporter.reportRemoteJsonRetrived(agency.acronym, true);
+    Reporter.reportRemoteJsonParsed(agency.acronym, true);
 
     if(this.config.isProd) {
       const errorMessage = 'FAILURE: There was an error fetching the code.json:';
@@ -74,7 +78,8 @@ class AgencyJsonStream extends Transform {
           `${errorMessage} ${agency.codeUrl} returned ${response.status} and ` +
           `Content-Type ${response.headers['Content-Type']}. Using fallback data for indexing.`);
 
-        Reporter.reportFallbackUsed(agency.acronym, true);
+        Reporter.reportRemoteJsonRetrived(agency.acronym, false);
+        Reporter.reportRemoteJsonParsed(agency.acronym, false);
         return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
       }
 
@@ -87,11 +92,12 @@ class AgencyJsonStream extends Transform {
         return jsonData;
       } catch(error) {
         this.logger.error(`There was an error parsing JSON for agency: ${agency.acronym}`, error);
-        Reporter.reportFallbackUsed(agency.acronym, true);
+        Reporter.reportRemoteJsonParsed(agency.acronym, false);
         return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
       }
     } else {
-      Reporter.reportFallbackUsed(agency.acronym, true);
+      Reporter.reportRemoteJsonRetrived(agency.acronym, false);
+      Reporter.reportRemoteJsonParsed(agency.acronym, false);
       return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
     }
   }
@@ -219,12 +225,26 @@ class AgencyJsonStream extends Transform {
       .then(validatedRepos => this._formatRepos(agency, validatedRepos))
       .then(formattedRepos => {
         const engine = new RulesEngine(getRules());
+        const returnRepos = [];
+        let counts = {
+          total: 0, 
+          unknown: 0
+        }
+        formattedRepos.forEach(repo => {
+          returnRepos.push(engine.execute(repo));
+          counts.total += 1;
+          if (repo.permissions && repo.permissions.usageType) {
+            if (!counts[repo.permissions.usageType]) {
+              counts[repo.permissions.usageType] = 0;
+            }
+            counts[repo.permissions.usageType] += 1;
+          } else {
+            counts.unknown += 1;
+          }
+        })
 
-        return Promise.all(
-          formattedRepos.map(repo => {
-            return engine.execute(repo);
-          })
-        );
+        Reporter.reportCounts(agency.acronym, counts);
+        return Promise.all(returnRepos);
       })
       .then(scoredRepos => scoredRepos.forEach(repo => this.push(repo)))
       .then(() => callback())

@@ -18,6 +18,7 @@ class StatusIndexer extends AbstractIndexer {
       .digest('hex');
 
     reporter.report.timestamp = (new Date()).toString();
+    reporter.report.statusID = idHash;
     return this.indexDocument({
       index: this.esIndex,
       type: this.esType,

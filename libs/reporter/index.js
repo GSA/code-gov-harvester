@@ -72,6 +72,21 @@ class Reporter {
     this.report.statuses[itemName]["wasFallbackUsed"] = wasFallbackUsed;
   }
 
+  reportRemoteJsonRetrived(itemName, wasRemoteJsonRetrived) {
+    this._createReportItemIfDoesntExist(itemName);
+    this.report.statuses[itemName]["wasRemoteJsonRetrived"] = wasRemoteJsonRetrived;
+  }
+
+  reportRemoteJsonParsed(itemName, wasRemoteJsonParsed) {
+    this._createReportItemIfDoesntExist(itemName);
+    this.report.statuses[itemName]["wasRemoteJsonParsed"] = wasRemoteJsonParsed;
+  }
+
+  reportCounts(itemName, counts) {
+    this._createReportItemIfDoesntExist(itemName);
+    this.report.statuses[itemName]["counts"] = counts;
+  }
+
   async indexReport() {
     const params = {
       esAlias: this.config.STATUS_INDEX_CONFIG.esAlias,
