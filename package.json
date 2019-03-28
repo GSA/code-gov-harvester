@@ -10,7 +10,8 @@
     "index-terms": "node ./scripts/index/term/index.js",
     "index-issues": "node ./scripts/index/issues/index.js",
     "security-check": "npm audit",
-    "test": "./node_modules/.bin/nyc mocha --reporter xunit tests",
+    "test": "mocha --reporter xunit tests",
+    "test-coverage": "./node_modules/.bin/nyc npm test",
     "lint": "./node_modules/.bin/eslint .",
     "lint-fix": "./node_modules/.bin/eslint --fix .",
     "postinstall": "opencollective-postinstall"
@@ -41,7 +42,8 @@
     "chai": "^4.2.0",
     "eslint": "^5.8.0",
     "mocha": "^5.2.0",
-    "nock": "^10.0.2"
+    "nock": "^10.0.2",
+    "nyc": "^13.3.0"
   },
   "dependencies": {
     "@code.gov/code-gov-adapter": "^1.1.6",
