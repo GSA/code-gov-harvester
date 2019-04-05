@@ -63,11 +63,13 @@ const usageTypeRule = {
     const usageType = target['permissions.usageType'];
 
     if (usageType.toLowerCase() === 'opensource') {
-      target.score = Utils.getScore(target, Utils.getFieldWeight('permissions.usageType'));
+      target.score = Utils.getScore(target, Utils.getFieldWeight('permissions.usageType.openSource'));
     } else if (usageType.toLowerCase() === 'governmentwidereuse') {
-      target.score = Utils.getScore(target, 0.5);
+      target.score = Utils.getScore(target, Utils.getFieldWeight('permissions.usageType.governmentWideReuse'));
+    } else if (target['permissions.usageType'] && target['permissions.usageType'].match(/^exempt.*/g)) {
+      target.score = Utils.getScore(target, Utils.getFieldWeight('permissions.usageType.exempt'));
     } else {
-      target.score = Utils.getScore(target, 0.1);
+      target.score = Utils.getScore(target, 0.0);
     }
 
     return target;
@@ -75,7 +77,8 @@ const usageTypeRule = {
 };
 const exemptionTextRule = {
   validation: function (target) {
-    if(target['permissions.usageType'] && target['permissions.usageType'].match(/^excempt.*/g)){
+    const usageType = target['permissions.usageType'];
+    if(usageType.match(/^exempt.*/g)){
       return target['permissions.exemptionText'] ? true : false;
     }
     return false;
