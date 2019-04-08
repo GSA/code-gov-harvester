@@ -181,10 +181,7 @@ class Utils {
     Object.keys(fieldWeights).forEach(key => {
       total += fieldWeights[key];
     });
-    return total - 
-      (fieldWeights["permissions.usageType.governmentWideReuse"] + 
-      fieldWeights["permissions.usageType.exempt"] +
-      fieldWeights["permissions.exemptionText"]);
+    return total;
   }
 
   static getScore(target, value) {

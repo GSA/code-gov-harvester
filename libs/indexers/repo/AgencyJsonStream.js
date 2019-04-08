@@ -250,7 +250,11 @@ class AgencyJsonStream extends Transform {
         Reporter.reportCounts(agency.acronym, counts);
         return Promise.all(returnRepos);
       })
-      .then(scoredRepos => scoredRepos.forEach(repo => this.push(repo)))
+      .then(scoredRepos => scoredRepos.forEach(repo => { 
+        repo.score = parseFloat((repo.rawScore * 10 / Utils.getMaxTotalWeight()).toFixed(1));
+        delete repo.rawScore;
+        this.push(repo) 
+      }))
       .then(() => callback())
       .catch(error => {
         this.logger.error(error);
