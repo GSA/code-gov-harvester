@@ -1,7 +1,7 @@
 const { AbstractIndexer } = require("../../index_tools");
 const crypto = require("crypto");
 const { Logger } = require('../../loggers');
-const { GMailMailer } = require("../../mailer");
+const { GMailMailer, SMTPMailer } = require("../../mailer");
 
 class StatusIndexer extends AbstractIndexer {
   get LOGGER_NAME() {
@@ -11,6 +11,13 @@ class StatusIndexer extends AbstractIndexer {
   constructor(adapter, params, config) {
     super(adapter, params);
     this.logger = new Logger( { name: this.LOGGER_NAME, level: config.LOGGER_LEVEL });
+    this.sendStatusMail = config.SEND_STATUS_EMAIL;
+    this.mailServer = config.EMAIL_SERVER;
+    this.mailServerPort = config.EMAIL_SERVER_PORT;
+    this.mailFrom = config.EMAIL_FROM;
+    this.mailTo = config.EMAIL_TO;
+    this.mailCC = config.EMAIL_CC;
+    this.mailBCC = config.EMAIL_BCC;
   }
 
   indexStatus (reporter) {
@@ -106,14 +113,25 @@ class StatusIndexer extends AbstractIndexer {
       await indexer.initMapping();
       await indexer.indexStatus(reporter);
 
-      try {
-        // TBD: To externalize user and password
-        const mailer = new GMailMailer({user: '****@gmail.com', pass: '*!*!*!*!*'});
-        // TBD: To externalize from, to, subject
-        await mailer.sendMail({from: '****@gmail.com', to: 'someone@some-domain.com', subject: "SUBJECT Details", html: html });
-      } catch(error) {
-        indexer.logger.error(error);
-        //throw error;  **Don't throw error if E-Mail cannot be sent **
+      if (indexer.sendStatusMail) {
+        try {
+          const mailer = new SMTPMailer({ 
+            host: indexer.mailServer, 
+            port: indexer.mailServerPort
+          });
+          await mailer.sendMail({
+            from: indexer.mailFrom, 
+            to: indexer.mailTo, 
+            cc: indexer.mailCC, 
+            bcc: indexer.mailBCC, 
+            subject: "[CODE.GOV] Repo Harvester Run Report", 
+            html: html 
+          });
+          indexer.logger.debug(`Status E-Mail Sent`);
+        } catch(error) {
+          indexer.logger.error(`${error} - Sending Status E-Mail`);
+          //throw error;  **Don't throw error if E-Mail cannot be sent **
+        }
       }
       return { esIndex: indexInfo.index, esAlias: indexer.esAlias };
     } catch(error) {

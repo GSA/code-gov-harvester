@@ -144,6 +144,15 @@ function getConfig(env='development') {
   config.TERMS_INDEX_CRON_CONFIG = process.env.TERMS_INDEX_CRON_CONFIG || '0 18 * * *';
   config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 */3 * * *';
 
+  // Used for Sending Mail
+  config.SEND_STATUS_EMAIL = process.env.SEND_STATUS_EMAIL && process.env.SEND_STATUS_EMAIL.toLowerCase() === "true";
+  config.EMAIL_SERVER = process.env.EMAIL_SERVER || 'localhost';
+  config.EMAIL_SERVER_PORT = process.env.EMAIL_SERVER_PORT || '25';
+  config.EMAIL_FROM = process.env.EMAIL_FROM || '';
+  config.EMAIL_TO = process.env.EMAIL_TO || '';
+  config.EMAIL_CC = process.env.EMAIL_CC || '';
+  config.EMAIL_BCC = process.env.EMAIL_BCC || '';
+
   Object.assign(config, getAppFilesDirectories(config.GET_REMOTE_METADATA));
 
   return config;

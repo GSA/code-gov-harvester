@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 class SMTPMailer {
-  constructor({host="localhost", port=587, secure=false, authType='login', user='', pass=''}) {
+  constructor({host="localhost", port=25, secure=false, authType='login', user='', pass=''}) {
     let options = {
       host,
       port,
