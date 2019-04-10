@@ -2,6 +2,7 @@ const { AbstractIndexer } = require("../../index_tools");
 const crypto = require("crypto");
 const { Logger } = require('../../loggers');
 const { GMailMailer, SMTPMailer } = require("../../mailer");
+const { StatusFormatter }= require("../../utils");
 
 class StatusIndexer extends AbstractIndexer {
   get LOGGER_NAME() {
@@ -20,6 +21,25 @@ class StatusIndexer extends AbstractIndexer {
     this.mailBCC = config.EMAIL_BCC;
   }
 
+  async readPreviousCounts () {
+    const aliasExists = await this.adapter.aliasExists({name: "status"});
+    let returnData = {};
+    if (aliasExists) {
+      try {
+        const { data } = await this.adapter.search({index: 'status', type: 'status'});
+        if (data && data.length === 1) {
+          Object.keys(data[0].statuses).forEach(acronym => {
+            returnData[acronym] = data[0].statuses[acronym].counts;
+          });
+        }
+      } catch (error) {
+        this.logger.error(error);
+        // throw error;  ** Don't throw error if cannot get previous status data **
+        }
+    }
+    return returnData;
+  }
+
   indexStatus (reporter) {
     const idHash = crypto.createHash('md5')
       .update(JSON.stringify(reporter.report), 'utf-8')
@@ -35,71 +55,8 @@ class StatusIndexer extends AbstractIndexer {
     });
   }
 
-  _convertToHTMLTRs({agencies, caption="", type=""}) {
-    if (agencies.length > 0) {
-      agencies.sort((a, b) => {
-        let acronymA = a.acronym.toLowerCase(), acronymB = b.acronym.toLowerCase();
-        return (acronymA < acronymB) ? -1 : (acronymA > acronymB) ? 1 : 0;
-      });
-      let bgColor = type.toLowerCase() === "error" ? "#F5A9A9"
-        : type.toLowerCase() === "warning" ? "#F2F5A9" 
-        : type.toLowerCase() === "duplicates" ? "#A9E2F3" 
-        : "#FFFFFF";
-      
-      let html = "";
-      if (caption) {
-        html = `<tr style="background-color: ${bgColor}; font-weight: bold">
-        <td colspan="5">${caption}</td>
-        </tr>`;        
-      }
-
-      agencies.forEach(agency => {
-        let counts = [];
-        Object.keys(agency.counts).forEach(usageType => {
-           counts.push(usageType + ": <em>" + agency.counts[usageType] + "</em>");
-        });
-        html += `<tr style="background-color: ${bgColor}">
-         <td>${agency.acronym}</td>
-         <td>${(agency.wasRemoteJsonRetrived ? "Yes" : "No")}</td>
-         <td>${(agency.wasRemoteJsonParsed ? "Yes" : "No")}</td>
-         <td>${(agency.wasFallbackUsed ? "Yes" : "No")}</td>
-         <td>${counts.join(" | ")}</td>
-         </tr>`;
-      });
-      return html;
-    }
-    return "";
-  }
-
-  getStatusHTML({report}) {
-    let agencies = [];
-    Object.keys(report.statuses).forEach(acronym => {
-      const { wasFallbackUsed, wasRemoteJsonRetrived, wasRemoteJsonParsed, counts } = report.statuses[acronym];
-      agencies.push({acronym, wasFallbackUsed, wasRemoteJsonRetrived, wasRemoteJsonParsed, counts});
-    });
-    let html = `<h3>CODE.GOV Repository Harvester Execution Summary</h3>
-      <h4>Time: ${report.timestamp}</h4>
-      <table border="1" cellspacing="0" cellpadding="2">
-        <tr style="background-color: #E6E6E6">
-        <th>Agency<br />Acronym</th>
-        <th>Retrieved Remote<br />code.json</th>
-        <th>Parsed Remote<br />code.json</th>
-        <th>Fallback<br />Used</th>
-        <th>Repository Counts</th> 
-        </tr>`;
-    html += this._convertToHTMLTRs({ agencies: agencies.filter(agency => !agency.wasRemoteJsonRetrived && !agency.wasFallbackUsed), caption: "No remote code.json file.  Missing fallback file or errors while processing fallback file.", type: "error" });
-    html += this._convertToHTMLTRs({ agencies: agencies.filter(agency => agency.wasRemoteJsonRetrived && !agency.wasRemoteJsonParsed && !agency.wasFallbackUsed), caption: "Errors while processing remote code.json file.  Missing fallback file or errors while processing fallback file.", type: "error" });
-    html += this._convertToHTMLTRs({ agencies: agencies.filter(agency => !agency.wasRemoteJsonRetrived && agency.wasFallbackUsed), caption: "No remote code.json file.  Used fallback file successfully.", type: "warning" });
-    html += this._convertToHTMLTRs({ agencies: agencies.filter(agency => agency.wasRemoteJsonRetrived && !agency.wasRemoteJsonParsed && agency.wasFallbackUsed), caption: "Errors while processing Remote code.json file.  Used fallback file successfully.", type:"warning" });
-    html += this._convertToHTMLTRs({ agencies: agencies.filter(agency => agency.wasRemoteJsonRetrived && agency.wasRemoteJsonParsed && agency.counts.duplicates), caption: "Used remote code.json successfully - with duplicates.", type: "duplicates" });
-    html += this._convertToHTMLTRs({ agencies: agencies.filter(agency => agency.wasRemoteJsonRetrived && agency.wasRemoteJsonParsed && !agency.counts.duplicates), caption: "Used remote code.json successfully." });
-    html += `</table>`;
-    return html 
-  }
-
   static async init(reporter, adapter, esParams, config) {
     const indexer = new StatusIndexer(adapter, esParams, config);
-    const html = indexer.getStatusHTML(reporter);
 
     indexer.logger.info(`Started indexing (${indexer.esType}) indices.`);
 
@@ -114,6 +71,8 @@ class StatusIndexer extends AbstractIndexer {
       await indexer.indexStatus(reporter);
 
       if (indexer.sendStatusMail) {
+        const allPreviousCounts = await indexer.readPreviousCounts();
+        const statusFormatter = new StatusFormatter({report: reporter.report, allPreviousCounts});
         try {
           const mailer = new SMTPMailer({ 
             host: indexer.mailServer, 
@@ -125,12 +84,12 @@ class StatusIndexer extends AbstractIndexer {
             cc: indexer.mailCC, 
             bcc: indexer.mailBCC, 
             subject: "[CODE.GOV] Repo Harvester Run Report", 
-            html: html 
+            html: statusFormatter.getFormattedStatus() 
           });
           indexer.logger.debug(`Status E-Mail Sent`);
         } catch(error) {
           indexer.logger.error(`${error} - Sending Status E-Mail`);
-          //throw error;  **Don't throw error if E-Mail cannot be sent **
+          // throw error;  ** Don't throw error if E-Mail cannot be sent **
         }
       }
       return { esIndex: indexInfo.index, esAlias: indexer.esAlias };
