@@ -55,6 +55,42 @@ class StatusIndexer extends AbstractIndexer {
     });
   }
 
+  async sendStatusEMails(reporter) {
+    if (this.sendStatusMail) {
+      const allPreviousCounts = await this.readPreviousCounts();
+      const statusFormatter = new StatusFormatter({report: reporter.report, allPreviousCounts});
+        try {
+        const mailer = new SMTPMailer({ 
+          host: this.mailServer, 
+          port: this.mailServerPort
+        });
+        await mailer.sendMail({
+          from: this.mailFrom, 
+          to: this.mailTo, 
+          cc: this.mailCC, 
+          bcc: this.mailBCC, 
+          subject: "[CODE.GOV] Harvester daily run report", 
+          html: statusFormatter.getFormattedStatus("daily") 
+        });
+        const today = new Date();
+        if ((new Date(today.getFullYear(), today.getMonth(), today.getDate()+1)).getMonth() !== today.getMonth()) {
+          await mailer.sendMail({
+            from: this.mailFrom, 
+            to: this.mailTo, 
+            cc: this.mailCC, 
+            bcc: this.mailBCC, 
+            subject: "[CODE.GOV] Harvester month-end Summary", 
+            html: statusFormatter.getFormattedStatus("monthEnd") 
+          });
+        }
+        this.logger.debug(`Status E-Mail(s) Sent`);
+      } catch(error) {
+        this.logger.error(`${error} - Sending Status E-Mail`);
+        // throw error;  ** Don't throw error if E-Mail cannot be sent **
+      }
+    }
+  }
+
   static async init(reporter, adapter, esParams, config) {
     const indexer = new StatusIndexer(adapter, esParams, config);
 
@@ -70,28 +106,8 @@ class StatusIndexer extends AbstractIndexer {
       await indexer.initMapping();
       await indexer.indexStatus(reporter);
 
-      if (indexer.sendStatusMail) {
-        const allPreviousCounts = await indexer.readPreviousCounts();
-        const statusFormatter = new StatusFormatter({report: reporter.report, allPreviousCounts});
-        try {
-          const mailer = new SMTPMailer({ 
-            host: indexer.mailServer, 
-            port: indexer.mailServerPort
-          });
-          await mailer.sendMail({
-            from: indexer.mailFrom, 
-            to: indexer.mailTo, 
-            cc: indexer.mailCC, 
-            bcc: indexer.mailBCC, 
-            subject: "[CODE.GOV] Repo Harvester Run Report", 
-            html: statusFormatter.getFormattedStatus() 
-          });
-          indexer.logger.debug(`Status E-Mail Sent`);
-        } catch(error) {
-          indexer.logger.error(`${error} - Sending Status E-Mail`);
-          // throw error;  ** Don't throw error if E-Mail cannot be sent **
-        }
-      }
+      await indexer.sendStatusEMails(reporter);
+
       return { esIndex: indexInfo.index, esAlias: indexer.esAlias };
     } catch(error) {
       indexer.logger.error(error);
