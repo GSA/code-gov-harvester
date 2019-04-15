@@ -260,6 +260,15 @@ class Utils {
     }
     return inputString;
   }
+
+  static isLastDayOfMonth(dt=null) {
+    if (!dt) {
+      dt = new Date();
+    }
+    let nextDt = new Date(dt);
+    nextDt = nextDt.setDate(dt.getDate() + 1);
+    return (dt.getMonth() !== nextDt.getMonth())
+  }
 }
 
 module.exports = Utils;
