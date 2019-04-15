@@ -146,6 +146,7 @@ function getConfig(env='development') {
 
   // Used for Sending Mail
   config.SEND_STATUS_EMAIL = process.env.SEND_STATUS_EMAIL && process.env.SEND_STATUS_EMAIL.toLowerCase() === "true";
+  config.SEND_SUMMARY_EVERYDAY = process.env.SEND_SUMMARY_EVERYDAY && process.env.SEND_SUMMARY_EVERYDAY.toLowerCase() === "true";
   config.EMAIL_SERVER = process.env.EMAIL_SERVER || 'localhost';
   config.EMAIL_SERVER_PORT = process.env.EMAIL_SERVER_PORT || '25';
   config.EMAIL_FROM = process.env.EMAIL_FROM || '';
