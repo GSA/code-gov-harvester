@@ -2,7 +2,7 @@ const { AbstractIndexer } = require("../../index_tools");
 const crypto = require("crypto");
 const { Logger } = require('../../loggers');
 const { GMailMailer, SMTPMailer } = require("../../mailer");
-const { StatusFormatter }= require("../../utils");
+const { Utils, StatusFormatter }= require("../../utils");
 
 class StatusIndexer extends AbstractIndexer {
   get LOGGER_NAME() {
@@ -13,6 +13,7 @@ class StatusIndexer extends AbstractIndexer {
     super(adapter, params);
     this.logger = new Logger( { name: this.LOGGER_NAME, level: config.LOGGER_LEVEL });
     this.sendStatusMail = config.SEND_STATUS_EMAIL;
+    this.sendSummaryEveryDay = config.SEND_SUMMARY_EVERYDAY;
     this.mailServer = config.EMAIL_SERVER;
     this.mailServerPort = config.EMAIL_SERVER_PORT;
     this.mailFrom = config.EMAIL_FROM;
@@ -59,7 +60,7 @@ class StatusIndexer extends AbstractIndexer {
     if (this.sendStatusMail) {
       const allPreviousCounts = await this.readPreviousCounts();
       const statusFormatter = new StatusFormatter({report: reporter.report, allPreviousCounts});
-        try {
+      try {
         const mailer = new SMTPMailer({ 
           host: this.mailServer, 
           port: this.mailServerPort
@@ -72,8 +73,7 @@ class StatusIndexer extends AbstractIndexer {
           subject: "[CODE.GOV] Harvester daily run report", 
           html: statusFormatter.getFormattedStatus("daily") 
         });
-        const today = new Date();
-        if ((new Date(today.getFullYear(), today.getMonth(), today.getDate()+1)).getMonth() !== today.getMonth()) {
+        if (this.mailConfig.sendSummaryEveryDay || Utils.isLastDayOfMonth()) {
           await mailer.sendMail({
             from: this.mailFrom, 
             to: this.mailTo, 
