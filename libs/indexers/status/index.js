@@ -1,7 +1,7 @@
 const { AbstractIndexer } = require("../../index_tools");
 const crypto = require("crypto");
 const { Logger } = require('../../loggers');
-const { GMailMailer, SMTPMailer } = require("../../mailer");
+const { SMTPMailer } = require("../../mailer");
 const { Utils, StatusFormatter }= require("../../utils");
 
 class StatusIndexer extends AbstractIndexer {
@@ -16,6 +16,9 @@ class StatusIndexer extends AbstractIndexer {
     this.sendSummaryEveryDay = config.SEND_SUMMARY_EVERYDAY;
     this.mailServer = config.EMAIL_SERVER;
     this.mailServerPort = config.EMAIL_SERVER_PORT;
+    this.mailServerSecure = config.EMAIL_SERVER_SECURE;
+    this.mailServerUser = config.EMAIL_SERVER_USER;
+    this.mailServerPassword = config.EMAIL_SERVER_PASSWORD;
     this.mailFrom = config.EMAIL_FROM;
     this.mailTo = config.EMAIL_TO;
     this.mailCC = config.EMAIL_CC;
@@ -63,26 +66,23 @@ class StatusIndexer extends AbstractIndexer {
       try {
         const mailer = new SMTPMailer({ 
           host: this.mailServer, 
-          port: this.mailServerPort
+          port: this.mailServerPort,
+          secure: this.mailServerSecure,
+          user: this.mailServerUser,
+          pass: this.mailServerPassword
         });
+        let html = statusFormatter.getFormattedStatus("daily");
+        if (this.sendSummaryEveryDay || Utils.isLastDayOfMonth()) {
+          html += statusFormatter.getFormattedStatus("monthEnd");
+        }
         await mailer.sendMail({
           from: this.mailFrom, 
           to: this.mailTo, 
           cc: this.mailCC, 
           bcc: this.mailBCC, 
-          subject: "[CODE.GOV] Harvester daily run report", 
-          html: statusFormatter.getFormattedStatus("daily") 
+          subject: "[CODE.GOV] Harvester run report", 
+          html: html 
         });
-        if (this.mailConfig.sendSummaryEveryDay || Utils.isLastDayOfMonth()) {
-          await mailer.sendMail({
-            from: this.mailFrom, 
-            to: this.mailTo, 
-            cc: this.mailCC, 
-            bcc: this.mailBCC, 
-            subject: "[CODE.GOV] Harvester month-end Summary", 
-            html: statusFormatter.getFormattedStatus("monthEnd") 
-          });
-        }
         this.logger.debug(`Status E-Mail(s) Sent`);
       } catch(error) {
         this.logger.error(`${error} - Sending Status E-Mail`);

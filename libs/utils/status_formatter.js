@@ -16,7 +16,7 @@ class StatusFormatter {
                 (runType === "daily" && type.toLowerCase() === "duplicates") ? "#A9E2F3" :
                 "#FFFFFF";
 
-            let html = "";
+            let html = "<tbody>";
             if (runType === "daily" && caption) {
                 html = `<tr style="background-color: ${bgColor}; font-weight: bold">
                     <td colspan="6">${caption}</td>
@@ -29,16 +29,12 @@ class StatusFormatter {
                     let changeText = "";
                     if (agency.added) {
                         Object.keys(agency.counts).forEach(usageType => {
-                            let countsText = `${usageType}: `;
-                            countsText += `<em>${agency.counts[usageType]}</em>`;
-                            counts.push(countsText);
+                            counts.push(`${usageType}: <em>${agency.counts[usageType]}</em>`);
                         });
                         changeText = "Added";
                     } else if (agency.removed) {
                         Object.keys(agency.previousCounts).forEach(usageType => {
-                            let countsText = `${usageType}: `;
-                            countsText += `<em>${agency.previousCounts[usageType]}</em>`;
-                            counts.push(countsText);
+                            counts.push(`${usageType}: <em>${agency.previousCounts[usageType]}</em>`);
                         });
                         changeText = "Removed";
                     } else {
@@ -56,11 +52,8 @@ class StatusFormatter {
                         //** For - Usage Type that existed previously and no longer exists  */
                         Object.keys(agency.previousCounts).filter(usageType => agency.counts[usageType] === undefined)
                         .forEach(usageType => {
-                            let countsText = `${usageType}: `;
-                            const previousUsageTypeCount = agency.previousCounts[usageType];
-                            countsText += `<em>0 (${previousUsageTypeCount})</em>`;
+                            counts.push(`${usageType}: <em>0 (${agency.previousCounts[usageType]})</em>`);
                             changeText = "Updated";
-                            counts.push(countsText);
                         });
                     }
                     html += `<tr style="background-color: ${bgColor}">
@@ -72,7 +65,9 @@ class StatusFormatter {
                         <td>${changeText}</td>
                         </tr>`;
                 });
+                html +="</tbody>"
             } else {
+                let totalCounts = { total: 0, openSource: 0, governmentWideReuse: 0, exemptOther: 0 }; 
                 agencies.forEach(agency => {
                     let counts = { total: 0, openSource: 0, governmentWideReuse: 0, exemptOther: 0 };
                     Object.keys(agency.counts).forEach(usageType => {
@@ -82,26 +77,38 @@ class StatusFormatter {
                                 break;
                             case "total":
                                 counts.total = agency.counts.total;
+                                totalCounts.total += agency.counts.total;
                                 break;
                             case "openSource":
                                 counts.openSource = agency.counts.openSource;
+                                totalCounts.openSource += agency.counts.openSource;
                                 break;
                             case "governmentWideReuse":
                                 counts.governmentWideReuse = agency.counts.governmentWideReuse;
+                                totalCounts.governmentWideReuse += agency.counts.governmentWideReuse;
                                 break;
                             default:
                                 counts.exemptOther += agency.counts[usageType];
+                                totalCounts.exemptOther += agency.counts[usageType];
                                 break;
                         }
                     });
                     html += `<tr style="background-color: ${bgColor}">
                     <td>${agency.acronym}</td>
-                    <td>${(counts.total)}</td>
-                    <td>${(counts.openSource)}</td>
-                    <td>${(counts.governmentWideReuse)}</td>
-                    <td>${(counts.exemptOther)}</td>
+                    <td style="text-align:right">${counts.total}</td>
+                    <td style="text-align:right">${counts.openSource}</td>
+                    <td style="text-align:right">${counts.governmentWideReuse}</td>
+                    <td style="text-align:right">${counts.exemptOther}</td>
                     </tr>`;
                 });
+                html += `</tbody>
+                <tfoot><tr style="background-color: #E6E6E6">
+                <th style="text-align:left">Total</th>
+                <th style="text-align:right">${totalCounts.total}</th>
+                <th style="text-align:right">${totalCounts.openSource}</th>
+                <th style="text-align:right">${totalCounts.governmentWideReuse}</th>
+                <th style="text-align:right">${totalCounts.exemptOther}</th>
+                </tfoot></tr>`
             }
             return html;
         }
@@ -112,6 +119,7 @@ class StatusFormatter {
         let html = `<h3>CODE.GOV Repository Harvester Execution Summary</h3>
         <h4>Time: ${timestamp}</h4>
         <table border="1" cellspacing="0" cellpadding="2">
+          <thead>
           <tr style="background-color: #E6E6E6">
           <th>Agency<br />Acronym</th>
           <th>Retrieved Remote<br />code.json</th>
@@ -119,7 +127,8 @@ class StatusFormatter {
           <th>Fallback<br />Used</th>
           <th>Repository Counts</th> 
           <th>Change</th>
-          </tr>`;
+          </tr>
+          </thead>`;
         html += this._convertToHTMLTRs({
             agencies: agencies.filter(agency => !agency.removed && !agency.wasRemoteJsonRetrived && !agency.wasFallbackUsed),
             caption: "No remote code.json file.  Missing fallback file or errors while processing fallback file.",
@@ -157,20 +166,21 @@ class StatusFormatter {
         return html
     }
 
-    _getMonthEndHTML({timestamp, agencies}) {
-        let html = `<h3>CODE.GOV Repository Harvester Execution Summary</h3>
-        <h4>Time: ${timestamp}</h4>
+    _getMonthEndHTML({agencies}) {
+        let html = `<hr/><h3>Summary</h3>
         <table border="1" cellspacing="0" cellpadding="2">
+          <thead>
           <tr style="background-color: #E6E6E6">
           <th rowspan="2">Agency<br />Acronym</th>
           <th colspan="4">Repository Counts</th>
           </tr>
           <tr style="background-color: #E6E6E6">
-          <th>Total</th> 
-          <th>Open Source</th>
-          <th>Govenment Wide Re-use</th>
-          <th>Exempt / Other</th>
-          </tr>`;
+          <th style="text-align:right">Total</th> 
+          <th style="text-align:right">Open Source</th>
+          <th style="text-align:right">Govenment Wide Re-use</th>
+          <th style="text-align:right">Exempt / Other</th>
+          </tr>
+          </thead>`;
         html += this._convertToHTMLTRs({
             agencies: agencies.filter(agency => !agency.removed),
             runType: "monthEnd"

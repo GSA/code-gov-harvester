@@ -22,24 +22,6 @@ class SMTPMailer {
   }
 }
 
-class GMailMailer {
-
-  constructor({ user, pass }) {
-    this.transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user, pass }
-    });
-  }
-
-  async sendMail({from, to, cc, bcc, subject, html}) {
-    await this.transporter.sendMail({
-      from, to, cc, bcc, subject, html
-    });
-  }
-
-}
-
 module.exports = {
-  SMTPMailer,
-  GMailMailer
+  SMTPMailer
 };
