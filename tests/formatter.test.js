@@ -89,7 +89,7 @@ describe('Formatter Test', () => {
         },
         "complianceDashboard": true
       },
-      "repoID": "gsa_gsa_1_code_gov_harvester",
+      "repoID": "gsa_gsa_1_code_gov_harvester"
     };
     const result = await formatter.formatRepo('2.0.0', inputRepo);
 
