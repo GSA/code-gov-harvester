@@ -158,7 +158,8 @@ class IndexCleaner {
 }
 
 /**
- * The first two indexes of the argv array are the execution path and the file being executed. The parameters we want start at the third index.
+ * The first two indexes of the argv array are the execution path and the file being executed.
+ * The parameters we want start at the third index.
  * More info here: https://nodejs.org/api/process.html#process_process_argv
  */
 if (require.main === module) {
@@ -175,8 +176,8 @@ if (require.main === module) {
       }
 
       if(process.argv[2]) {
-        if(isNan(parseInt(process.argv[3])) || parseInt(process.argv[3])) {
-          throw new Error('daysToKeep parameter should be a positive integer')
+        if(isNaN(parseInt(process.argv[3])) || parseInt(process.argv[3])) {
+          throw new Error('daysToKeep parameter should be a positive integer');
         }
         daysToKeep = parseInt(process.argv[3]);
       }
@@ -190,7 +191,8 @@ if (require.main === module) {
         .then(() => logger.info(`Index cleanup completed for Alias: ${alias}`))
         .catch(error => logger.error(`There were errors while cleaning indexes for Alias: ${alias}`, error));
     } else {
-      throw new Error('Too few parameters passed. The minimum required parameters is 1 for the index alias to be used.')
+      throw new Error(
+        'Too few parameters passed. The minimum required parameters is 1 for the index alias to be used.');
     }
   } catch(error) {
     logger.error('There was an error executing the index-cleaner.', error);

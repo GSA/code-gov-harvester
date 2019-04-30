@@ -70,11 +70,11 @@ if(require.main === module) {
   const log = new Logger({ name: 'data-score-normalization', level: config.LOGGER_LEVEL });
 
   if(process.argv.length < 4) {
-    throw new Error('Not enough parameters passed. targetIndex and alias are required.')
+    throw new Error('Not enough parameters passed. targetIndex and alias are required.');
   }
 
-  const index = process.argv[2]
-  const type = process.argv[3]
+  const index = process.argv[2];
+  const type = process.argv[3];
 
   normalizeRepoScores({ adapter, index, type , config, log })
     .then(() => logger.info('Finished score normalization.'))

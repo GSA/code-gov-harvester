@@ -1,6 +1,6 @@
 const { Logger, ElasticsearchLogger } = require("../loggers");
 const adapter = require('@code.gov/code-gov-adapter');
-
+const getConfig = require('../../config');
 /**
  * Class for Swapping out ElasticSearch Aliases
  *
@@ -148,7 +148,7 @@ if (require.main === module) {
   const logger = new Logger({ name: 'alias-swapper' });
   try {
     if(process.argv.length < 4) {
-      throw new Error('Not enough parameters passed. targetIndex and alias are required.')
+      throw new Error('Not enough parameters passed. targetIndex and alias are required.');
     }
 
     const targetIndex = process.argv[2];
@@ -162,7 +162,7 @@ if (require.main === module) {
       logger
     })
       .then(() => logger.info(`Finished swapping alias: ${alias} for index: ${targetIndex}`))
-      .catch(error => indexer.logger.error(error));
+      .catch(error => logger.error(error));
   } catch(error) {
     logger.error(`There was an error executing the alias-swapper. ${error}`);
   }

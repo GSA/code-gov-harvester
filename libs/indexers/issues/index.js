@@ -1,7 +1,7 @@
 const { AbstractIndexer } = require("../../index_tools");
 const crypto = require("crypto");
 const { Logger } = require('../../loggers');
-const { getClient, getCodeGovRepos, getRepoIssues } = require('../../integrations/github')
+const { getClient, getCodeGovRepos, getRepoIssues } = require('../../integrations/github');
 const { Utils } = require('../../utils');
 const fs = require('fs');
 const Json2csvParser = require('json2csv').Parser;
@@ -18,7 +18,7 @@ class IssuesIndexer extends AbstractIndexer {
   }
 
   async indexIssue (issue) {
-    const id = Utils.transformStringToKey(issue.title)
+    const id = Utils.transformStringToKey(issue.title);
 
     return await this.indexDocument({
       index: this.esIndex,
@@ -33,7 +33,7 @@ class IssuesIndexer extends AbstractIndexer {
     const fields = [
       'issueId', 'repoId', 'url', 'state', 'updated_at', 'merged_at', 'created_at', 'title',
       'description','body','labels','repositoryURL','agencyName','agencyAcronym', 'agencyWebsite'
-    ]
+    ];
     let csv;
 
     try {
@@ -61,7 +61,7 @@ class IssuesIndexer extends AbstractIndexer {
     const outputFileName = `./issues-${new Date().toISOString()}.csv`;
 
     for(const { owner, repo, codeGovRepoId, agency, repositoryURL } of codeGovRepos) {
-      this.logger.info(`Processing repo: ${owner}/${repo} - agency: ${agency.acronym} - code_gov_repo_id: ${codeGovRepoId} - repository_url: ${repositoryURL}`)
+      this.logger.info(`Processing repo: ${owner}/${repo} - agency: ${agency.acronym} - code_gov_repo_id: ${codeGovRepoId} - repository_url: ${repositoryURL}`);
       let { issues, error } = await getRepoIssues({ owner, repo, client: this.client });
 
       if(Object.keys(error).length) {

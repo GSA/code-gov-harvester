@@ -49,7 +49,7 @@ class ElasticsearchLogger extends Logger {
     return 'info';
   }
   get label() {
-    return 'elasticsearch'
+    return 'elasticsearch';
   }
 }
 

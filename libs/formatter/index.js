@@ -3,7 +3,6 @@ const { Logger } = require("../loggers");
 const moment = require("moment");
 const path = require('path');
 const { Utils } = require("../utils");
-const getConfig = require('../../config');
 
 class Formatter {
   constructor(config) {
@@ -26,7 +25,6 @@ class Formatter {
       repo.date.metadataLastUpdated = repo.date.metadataLastUpdated
         ? this._formatDate(repo.date.metadataLastUpdated)
         : null;
-
 
       repo.date.created = repo.date.created
         ? this._formatDate(repo.date.created)
@@ -144,7 +142,9 @@ class Formatter {
 
   _getUsageCode(repo) {
     const { usageType } = repo.permissions ? repo.permissions : {"usageType": null};
-    return (usageType && this.exemptionsCodes[usageType]) ? this.exemptionsCodes[usageType] : this.exemptionsCodes["other"];
+    return (usageType && this.exemptionsCodes[usageType])
+      ? this.exemptionsCodes[usageType]
+      : this.exemptionsCodes["other"];
   }
 
   _formatRepo(repo){

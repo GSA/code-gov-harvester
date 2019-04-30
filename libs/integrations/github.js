@@ -47,7 +47,7 @@ async function getCodeGovRepos(adapter) {
       && Utils.isValidRepositoryUrl(repo.repositoryURL)
   );
 
-  logger.info('Filtering Code.gov repos to only those on Github.')
+  logger.info('Filtering Code.gov repos to only those on Github.');
   return codeGovRepos.map(codeGovRepo => {
     const {owner, repo} = Utils.parseGithubUrl(codeGovRepo.repositoryURL);
 
@@ -55,7 +55,7 @@ async function getCodeGovRepos(adapter) {
       name: codeGovRepo.agency.name,
       acronym: codeGovRepo.agency.acronym,
       website: codeGovRepo.agency.website
-    }
+    };
 
     return {
       owner,
@@ -63,7 +63,7 @@ async function getCodeGovRepos(adapter) {
       agency,
       codeGovRepoId: codeGovRepo.repoID,
       repositoryURL: codeGovRepo.repositoryURL
-     };
+    };
   });
 }
 
@@ -79,4 +79,4 @@ module.exports = {
   getClient,
   getCodeGovRepos,
   getRepoIssues
-}
+};
