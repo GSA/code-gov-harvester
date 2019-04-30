@@ -1,6 +1,5 @@
 const moment = require("moment");
-const { Logger, ElasticsearchLogger } = require("../loggers");
-
+const { ElasticsearchLogger} = require('../loggers');
 class AbstractIndexer {
 
   get LOGGER_NAME() {
@@ -17,9 +16,12 @@ class AbstractIndexer {
       apiVersion: params.esApiVersion
     });
 
-    this.logger = new Logger({ name: this.LOGGER_NAME });
     this.esAlias = params.esAlias ? params.esAlias : undefined;
-    this.esIndex = params.esIndex ? params.esIndex : this.esAlias ? this.esAlias + timestamp : undefined;
+    this.esIndex = params.esIndex
+      ? params.esIndex
+      : this.esAlias
+        ? this.esAlias + timestamp
+        : undefined;
     this.esType = params.esType ? params.esType : undefined;
     this.esMapping = params.esMapping ? params.esMapping : undefined;
     this.esSettings = params.esSettings ? params.esSettings : undefined;
@@ -69,12 +71,6 @@ class AbstractIndexer {
       body: this.esMapping
     });
   }
-
-  // implement this when extending
-  static init(adapter, callback) {
-    return callback();
-  }
-
 }
 
 module.exports = {

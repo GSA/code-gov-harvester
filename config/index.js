@@ -11,7 +11,7 @@ const Jsonfile = require('jsonfile');
  * @returns {object} Object with index mappings and settings.
  */
 function getIndexConfig(index) {
-  if(['repo', 'status', 'term'].includes(index)) {
+  if(['repo', 'status', 'term', 'issue'].includes(index)) {
     const mappings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/mapping.json`));
     const settings = Jsonfile.readFileSync(path.join(path.dirname(__dirname), `config/indexes_configs/${index}/settings.json`));
     const esAlias = index === 'status' ? index : `${index}s`;
@@ -125,12 +125,24 @@ function getConfig(env='development') {
   config.REPO_INDEX_CONFIG = getIndexConfig('repo');
   config.TERM_INDEX_CONFIG = getIndexConfig('term');
   config.STATUS_INDEX_CONFIG = getIndexConfig('status');
+  config.ISSUE_INDEX_CONFIG = getIndexConfig('issue');
 
   config.ELASTICSEARCH_API_VERSION = '5.6';
 
   config.GET_REMOTE_METADATA = process.env.GET_REMOTE_METADATA
     && process.env.GET_REMOTE_METADATA === 'true'
     && process.env.REMOTE_METADATA_LOCATION;
+
+  // Used for our cron schedule.
+  config.TIME_ZONE = process.env.TIME_ZONE || 'America/New_York';
+
+  // These are Unix cron syntax. For more information please take a look at:
+  // https://www.npmjs.com/package/node-cron or https://en.wikipedia.org/wiki/Cron#Overview
+  // Repos are set to a default of once a day at 5pm
+  // Issues are set to run every 3 hours
+  config.REPOS_INDEX_CRON_CONFIG = process.env.REPOS_INDEX_CRON_CONFIG || '0 17 * * *';
+  config.TERMS_INDEX_CRON_CONFIG = process.env.TERMS_INDEX_CRON_CONFIG || '0 18 * * *';
+  config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 */3 * * *';
 
   Object.assign(config, getAppFilesDirectories(config.GET_REMOTE_METADATA));
 

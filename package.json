@@ -8,6 +8,7 @@
     "start": "node ./scripts/index/index.js",
     "index-repos": "node ./scripts/index/repo/index.js",
     "index-terms": "node ./scripts/index/term/index.js",
+    "index-issues": "node ./scripts/index/issues/index.js",
     "security-check": "npm audit",
     "test": "./node_modules/.bin/nyc mocha --reporter xunit tests",
     "lint": "./node_modules/.bin/eslint .",
@@ -40,15 +41,21 @@
   },
   "dependencies": {
     "@code.gov/code-gov-adapter": "^1.1.5",
-    "@code.gov/code-gov-integrations": "^1.0.4",
+    "@code.gov/code-gov-integrations": "^1.1.1",
     "@code.gov/code-gov-validator": "^1.0.1",
     "JSONStream": "^1.3.5",
     "cfenv": "^1.1.0",
     "dotenv": "^6.1.0",
     "encoding": "^0.1.12",
+    "json2csv": "^4.3.1",
     "jsonfile": "^5.0.0",
     "latinize": "^0.4.0",
+    "node-cron": "^2.0.3",
     "node-fetch": "^2.2.1",
     "winston": "^3.1.0"
+  },
+  "engines": {
+    "node": "^10.12.0",
+    "npm": "^6.4.1"
   }
 }

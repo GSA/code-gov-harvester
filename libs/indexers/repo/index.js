@@ -3,6 +3,7 @@ const JSONStream = require("JSONStream");
 const Reporter = require("../../reporter");
 const { AbstractIndexer } = require("../../index_tools");
 const fetch = require('node-fetch');
+const { Logger } = require('../../loggers');
 
 const AgencyJsonStream = require("./AgencyJsonStream");
 const RepoIndexerStream = require("./RepoIndexStream");
@@ -13,13 +14,13 @@ class RepoIndexer extends AbstractIndexer {
     return "repo-indexer";
   }
 
-  constructor({adapter, agencyEndpointsFile, fetchedFilesDir, fallbackFilesDir=null, params}) {
+  constructor({adapter, agencyEndpointsFile, fetchedFilesDir, fallbackFilesDir=null, params, config}) {
     super(adapter, params);
     this.indexCounter = 0;
     this.agencyEndpointsFile = agencyEndpointsFile;
     this.fetchedFilesDir = fetchedFilesDir;
     this.fallbackFilesDir = fallbackFilesDir;
-
+    this.logger = new Logger({ name: this.LOGGER_NAME, level: config.LOGGER_LEVEL});
   }
 
   async getMetadata(config) {
@@ -76,7 +77,8 @@ class RepoIndexer extends AbstractIndexer {
       agencyEndpointsFile: config.AGENCY_ENDPOINTS_FILE,
       fetchedFilesDir: config.FETCHED_DIR,
       fallbackFilesDir: config.FALLBACK_DIR,
-      params
+      params,
+      config
     });
 
     repoIndexer.logger.info(`Started indexing (${repoIndexer.esType}) indices.`);

@@ -3,6 +3,7 @@ const { SearchStream } = require("../../utils");
 const { AbstractIndexer } = require("../../index_tools");
 const RepoTermLoaderStream= require("./repo_term_loader_stream");
 const getConfig = require('../../../config');
+const { Logger } = require('../../loggers');
 
 class RepoTermIndexerStream extends Writable {
 
@@ -66,8 +67,9 @@ class TermIndexer extends AbstractIndexer {
       esSettings: config.TERM_INDEX_CONFIG.settings,
       esApiVersion: config.ELASTICSEARCH_API_VERSION
     }
-
     super(adapter, indexParams);
+
+    this.logger = new Logger({ name: this.LOGGER_NAME, level: config.LOOGER_LEVEL});
 
     let searchQuery = {
       index: config.REPO_INDEX_CONFIG.esAlias,
