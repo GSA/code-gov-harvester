@@ -41,29 +41,27 @@ async function getRepos({from=0, size=100, collection=[], adapter}) {
 }
 
 async function getCodeGovRepos(adapter) {
-  const {total, data} = await getRepos({ adapter });
+  const { data } = await getRepos({ adapter });
   const codeGovRepos = data.filter(repo => repo.permissions.usageType === 'openSource'
       && repo.repositoryURL
       && Utils.isValidRepositoryUrl(repo.repositoryURL)
   );
 
-  logger.info('Filtering Code.gov repos to only those on Github.')
+  logger.info('Filtering Code.gov repos to only those on Github.');
   return codeGovRepos.map(codeGovRepo => {
     const {owner, repo} = Utils.parseGithubUrl(codeGovRepo.repositoryURL);
-
-    agency = {
-      name: codeGovRepo.agency.name,
-      acronym: codeGovRepo.agency.acronym,
-      website: codeGovRepo.agency.website
-    }
 
     return {
       owner,
       repo ,
-      agency,
+      agency: {
+        name: codeGovRepo.agency.name,
+        acronym: codeGovRepo.agency.acronym,
+        website: codeGovRepo.agency.website
+      },
       codeGovRepoId: codeGovRepo.repoID,
       repositoryURL: codeGovRepo.repositoryURL
-     };
+    };
   });
 }
 
@@ -79,4 +77,4 @@ module.exports = {
   getClient,
   getCodeGovRepos,
   getRepoIssues
-}
+};

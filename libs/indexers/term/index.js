@@ -66,7 +66,7 @@ class TermIndexer extends AbstractIndexer {
       esMapping: config.TERM_INDEX_CONFIG.mappings,
       esSettings: config.TERM_INDEX_CONFIG.settings,
       esApiVersion: config.ELASTICSEARCH_API_VERSION
-    }
+    };
     super(adapter, indexParams);
 
     this.logger = new Logger({ name: this.LOGGER_NAME, level: config.LOOGER_LEVEL});

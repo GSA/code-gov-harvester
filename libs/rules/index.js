@@ -102,7 +102,7 @@ const contactEmailRule = {
     target.score = Utils.getScore(target, Utils.getFieldWeight('contact.email'));
     return target;
   }
-}
+};
 const contactNameRule = {
   validation: function (target) {
     return target['contact.name'] ? true : false;
@@ -342,7 +342,7 @@ const additionalInformationRule = {
     target.score = Utils.getScore(target, Utils.getFieldWeight('additional_information'));
     return target;
   }
-}
+};
 
 module.exports = function () {
   return [

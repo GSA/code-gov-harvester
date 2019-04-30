@@ -9,7 +9,6 @@ const Reporter = require("../../reporter");
 const { Utils } = require("../../utils");
 const RulesEngine = require('simple-rules-engine');
 const getRules = require('../../rules');
-const encoding = require('encoding');
 
 class AgencyJsonStream extends Transform {
   constructor(fetchedDir, fallbackDir, config) {

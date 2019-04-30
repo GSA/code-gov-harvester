@@ -42,7 +42,7 @@ class Indexer {
     }
   }
   async indexIssues() {
-    let issueIndexer = new IssueIndexer(this.config)
+    let issueIndexer = new IssueIndexer(this.config);
 
     try {
       await issueIndexer.index();
@@ -54,13 +54,13 @@ class Indexer {
 
   schedule({ jobName, cronConfig, scheduleParameters, targetFunction }) {
     return cron.schedule(cronConfig, () => {
-      this.logger.info(`Executing job: ${jobName}`)
+      this.logger.info(`Executing job: ${jobName}`);
       targetFunction()
         .then(() => {
           this.logger.info(`Finished job: ${jobName}.`);
         })
         .catch(error => {
-          this.logger.error(`[ERROR] job: ${jobName} - ${error}`)
+          this.logger.error(`[ERROR] job: ${jobName} - ${error}`);
         });
     }, scheduleParameters);
   }
