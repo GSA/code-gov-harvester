@@ -77,8 +77,8 @@ if(require.main === module) {
   const type = process.argv[3];
 
   normalizeRepoScores({ adapter, index, type , config, log })
-    .then(() => logger.info('Finished score normalization.'))
-    .catch(error => logger.error(error));
+    .then(() => log.info('Finished score normalization.'))
+    .catch(error => log.error(error));
 }
 
 module.exports = {

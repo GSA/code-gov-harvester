@@ -268,7 +268,7 @@ class Utils {
   }
 
   static isValidRepositoryUrl (repoUrl) {
-    const githubUrlRegEx = /(https|http|git):\/\/(www\.)?github.com\/[^\/]+\/[^\/]+(.git)?$/g;
+    const githubUrlRegEx = /(https|http|git):\/\/(www\.)?github.com\/[^/]+\/[^/]+(.git)?$/g;
     if (repoUrl) {
       const match = repoUrl.match(githubUrlRegEx);
 
