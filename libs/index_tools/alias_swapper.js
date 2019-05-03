@@ -119,10 +119,9 @@ class AliasSwapper {
    * @returns {Promise}
    */
   static async swapAlias({ adapter, index, alias, config, logger=undefined }) {
+    const swapper = new AliasSwapper({ adapter, config, logger });
+
     try {
-
-      const swapper = new AliasSwapper({ adapter, config, logger });
-
       swapper.logger.info(`Starting alias swapping.`);
 
       const exists = await swapper.aliasExists(alias);
