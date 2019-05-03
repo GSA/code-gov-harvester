@@ -13,22 +13,32 @@ class Formatter {
   }
 
   _formatDate(date) {
-    return moment(date, 'YYYY-MM-DD').utc().toJSON();
+    const result = moment(date, 'YYYY-MM-DD', true).utc().toJSON();
+    if(result === null) {
+      throw new Error('Bad date format');
+    }
+
+    return result;
   }
 
   _formatDates(repo) {
     if (repo.date) {
-      repo.date.lastModified = repo.date.lastModified
-        ? this._formatDate(repo.date.lastModified)
-        : null;
+      try {
+        repo.date.lastModified = repo.date.lastModified
+          ? this._formatDate(repo.date.lastModified)
+          : null;
 
-      repo.date.metadataLastUpdated = repo.date.metadataLastUpdated
-        ? this._formatDate(repo.date.metadataLastUpdated)
-        : null;
+        repo.date.metadataLastUpdated = repo.date.metadataLastUpdated
+          ? this._formatDate(repo.date.metadataLastUpdated)
+          : null;
 
-      repo.date.created = repo.date.created
-        ? this._formatDate(repo.date.created)
-        : null;
+        repo.date.created = repo.date.created
+          ? this._formatDate(repo.date.created)
+          : null;
+      } catch(error) {
+        throw error;
+      }
+
     }
   }
 
@@ -160,7 +170,11 @@ class Formatter {
       delete repo.agency.id;
     }
 
-    this._formatDates(repo);
+    try {
+      this._formatDates(repo);
+    } catch(error) {
+      throw error;
+    }
 
     return repo;
   }
