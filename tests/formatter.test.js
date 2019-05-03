@@ -99,7 +99,7 @@ describe('Formatter Test', () => {
 
       expect(result).to.be.deep.equals(expectedRepo);
     });
-  })
+  });
 
   describe('_formatDate', () => {
     it('should not throw an error', () => expect(() => formatter._formatDate('2016-08-01')).to.not.throw());
