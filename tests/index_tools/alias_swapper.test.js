@@ -2,7 +2,7 @@
 
 const expect = require('chai').expect;
 const nock = require('nock');
-const { AliasSwapper } = require('../../libs/index_tools')
+const { AliasSwapper } = require('../../libs/index_tools');
 const adapters = require('@code.gov/code-gov-adapter');
 
 describe('Alias Swapper tests', () => {
@@ -54,7 +54,7 @@ describe('Alias Swapper tests', () => {
           mockJsonContentType
         )
         .reply(200, { "acknowledged": true });
-    })
+    });
     it('should return an unchanged Elasticsearch response object', async () => {
       const expectedResult = { "acknowledged": true };
       const response = await AliasSwapper.swapAlias({
