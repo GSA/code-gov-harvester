@@ -1,3 +1,5 @@
+/* global before, describe, it */
+
 const expect = require('chai').expect;
 const nock = require('nock');
 const { AliasSwapper } = require('../../libs/index_tools')
@@ -14,11 +16,13 @@ describe('Alias Swapper tests', () => {
 
   before(() => {
     mockJsonContentType = { "Content-Type": "application/json" };
-    aliasUrl = `/_alias/${testAlias}`;
 
     adapter = adapters.elasticsearch.ElasticsearchAdapter;
     testIndex = 'test-index-1234';
     testAlias = 'testAlias';
+
+    aliasUrl = `/_alias/${testAlias}`;
+
     testConfig = {
       ES_HOST: 'http://localhost:9200',
       LOGGER_LEVEL: 'debug',
@@ -33,13 +37,23 @@ describe('Alias Swapper tests', () => {
         .persist()
         .head(aliasUrl)
         .reply(200, true)
+        .get(aliasUrl)
+        .reply(200, {"testAlias_index":{"aliases":{"testAlias":{}}}})
         .post('/_aliases',
           { "actions" : [{ "add":  { "index": "terms20181125_122432", "alias": "test" }}] },
           mockJsonContentType
         )
+        .reply(200, { "acknowledged": true })
+        .post('/_aliases',
+          {
+            "actions":[
+              {"remove":{"index":"testAlias_index","alias":"testAlias"}},
+              {"add":{"index":"test-index-1234","alias":"testAlias"}}
+            ]
+          },
+          mockJsonContentType
+        )
         .reply(200, { "acknowledged": true });
-        // .head(aliasUrl)
-        // .reply(200, true);
     })
     it('should return an unchanged Elasticsearch response object', async () => {
       const expectedResult = { "acknowledged": true };
@@ -53,7 +67,7 @@ describe('Alias Swapper tests', () => {
     });
   });
 
-  describe.skip('verify if alias exists', () => {
+  describe('verify if alias exists', () => {
     before(() => {
       nock('http://localhost:9200/')
         .head(aliasUrl)
