@@ -46,6 +46,8 @@ class AgencyJsonStream extends Transform {
     return new Promise((resolve, reject) => {
       Jsonfile.readFile(path.join(fallbackDir, fallbackFile), (err, jsonData) => {
         if(err) {
+          Reporter.reportFallbackUsed(agency.acronym, false);
+          Reporter.reportCounts(agency.acronym, {processed: 0});
           reject(`errorMessage ${fallbackFile} - ${err}`);
         }
         resolve(jsonData);
@@ -55,6 +57,10 @@ class AgencyJsonStream extends Transform {
 
   async _getAgencyCodeJson(agency){
     this.logger.info(`Entered _getAgencyCodeJson - Agency: ${agency.acronym}`);
+    
+    Reporter.reportFallbackUsed(agency.acronym, false);
+    Reporter.reportRemoteJsonRetrived(agency.acronym, false);
+    Reporter.reportRemoteJsonParsed(agency.acronym, false);
 
     if(this.config.isProd) {
       const errorMessage = 'FAILURE: There was an error fetching the code.json:';
@@ -74,24 +80,23 @@ class AgencyJsonStream extends Transform {
           `${errorMessage} ${agency.codeUrl} returned ${response.status} and ` +
           `Content-Type ${response.headers['Content-Type']}. Using fallback data for indexing.`);
 
-        Reporter.reportFallbackUsed(agency.acronym, true);
         return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
       }
 
       try {
+        Reporter.reportRemoteJsonRetrived(agency.acronym, true);
         const responseBuffer = await response.buffer();
         const jsonData = JSON.parse(Utils.stripBom(responseBuffer));
+        Reporter.reportRemoteJsonParsed(agency.acronym, true);
 
         this._saveFetchedCodeJson(agency.acronym, jsonData);
 
         return jsonData;
       } catch(error) {
         this.logger.error(`There was an error parsing JSON for agency: ${agency.acronym}`, error);
-        Reporter.reportFallbackUsed(agency.acronym, true);
         return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
       }
     } else {
-      Reporter.reportFallbackUsed(agency.acronym, true);
       return this._readFallbackData(agency, this.fallbackDir, agency.fallback_file);
     }
   }
@@ -219,14 +224,37 @@ class AgencyJsonStream extends Transform {
       .then(validatedRepos => this._formatRepos(agency, validatedRepos))
       .then(formattedRepos => {
         const engine = new RulesEngine(getRules());
+        const returnRepos = [];
+        const repoIDs = [];
+        let counts = {
+          processed: 0,
+          duplicates: 0,
+          total: 0,
+        }
+        formattedRepos.forEach(repo => {
+          counts.processed += 1;
+          if (repoIDs.includes(repo.repoID)) {
+            counts.duplicates +=  1;
+          } else {
+            returnRepos.push(engine.execute(repo));
+            repoIDs.push(repo.repoID);
+            counts.total += 1;
+          }
+          if (repo.permissions && repo.permissions.usageType) {
+              counts[repo.permissions.usageType] = counts[repo.permissions.usageType] ? counts[repo.permissions.usageType] + 1 : 1;
+          } else {
+            counts.unknown = counts.unknown ? counts.unknown + 1 : 1;
+          }
+        });
 
-        return Promise.all(
-          formattedRepos.map(repo => {
-            return engine.execute(repo);
-          })
-        );
+        Reporter.reportCounts(agency.acronym, counts);
+        return Promise.all(returnRepos);
       })
-      .then(scoredRepos => scoredRepos.forEach(repo => this.push(repo)))
+      .then(scoredRepos => scoredRepos.forEach(repo => { 
+        repo.score = parseFloat((repo.rawScore * 10 / Utils.getMaxTotalWeight()).toFixed(1));
+        delete repo.rawScore;
+        this.push(repo) 
+      }))
       .then(() => callback())
       .catch(error => {
         this.logger.error(error);

@@ -1,6 +1,6 @@
 applications:
 - name: code-gov-harvester
-  memory: 60M
+  memory: 200M
   instances: 1
   disk_quota: 200M
   health-check-type: process
@@ -19,6 +19,7 @@ applications:
     ELASTICSEARCH_SERVICE_NAME: code_gov_elasticsearch
     NODE_ENV: production
     TIME_ZONE: America/New_York
+    DISABLE_OPENCOLLECTIVE: true
   services:
   - code_gov_elasticsearch
   stack: cflinuxfs2
