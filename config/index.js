@@ -142,7 +142,7 @@ function getConfig(env='development') {
   // Issues are set to run every 3 hours
   config.REPOS_INDEX_CRON_CONFIG = process.env.REPOS_INDEX_CRON_CONFIG || '0 17 * * *';
   config.TERMS_INDEX_CRON_CONFIG = process.env.TERMS_INDEX_CRON_CONFIG || '0 18 * * *';
-  config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 */3 * * *';
+  config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 19 * * *';
 
   // Used for Sending Mail
   config.SEND_STATUS_EMAIL = process.env.SEND_STATUS_EMAIL && process.env.SEND_STATUS_EMAIL.toLowerCase() === "true";
