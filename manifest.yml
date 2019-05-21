@@ -20,7 +20,16 @@ applications:
     NODE_ENV: production
     TIME_ZONE: America/New_York
     DISABLE_OPENCOLLECTIVE: true
+    SEND_STATUS_EMAIL: false
+    SEND_SUMMARY_EVERYDAY: false
+    EMAIL_SERVER: localhost
+    EMAIL_SERVER_PORT: 25
+    EMAIL_SERVER_SECURE: false
+    EMAIL_SERVER_USER: no_user
+    EMAIL_SERVER_PASSWORD: no_password
+    EMAIL_FROM: somewhere@gsa.gov
+    EMAIL_TO: someone@gsa.gov
   services:
   - code_gov_elasticsearch
-  stack: cflinuxfs2
+  stack: cflinuxfs3
   command: npm start
