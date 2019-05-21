@@ -139,7 +139,8 @@ function getConfig(env='development') {
   // These are Unix cron syntax. For more information please take a look at:
   // https://www.npmjs.com/package/node-cron or https://en.wikipedia.org/wiki/Cron#Overview
   // Repos are set to a default of once a day at 5pm
-  // Issues are set to run every 3 hours
+  // Terms are set to a default of once a day at 6pm
+  // Issues are set to a default of once a day at 7pm
   config.REPOS_INDEX_CRON_CONFIG = process.env.REPOS_INDEX_CRON_CONFIG || '0 17 * * *';
   config.TERMS_INDEX_CRON_CONFIG = process.env.TERMS_INDEX_CRON_CONFIG || '0 18 * * *';
   config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 19 * * *';
