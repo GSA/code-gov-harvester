@@ -29,6 +29,9 @@ applications:
     EMAIL_SERVER_PASSWORD: no_password
     EMAIL_FROM: somewhere@gsa.gov
     EMAIL_TO: someone@gsa.gov
+    REPOS_INDEX_CRON_CONFIG: 0 17 * * *
+    TERMS_INDEX_CRON_CONFIG: 0 18 * * *
+    ISSUE_INDEX_CRON_CONFIG: 0 19 * * *
   services:
   - code_gov_elasticsearch
   stack: cflinuxfs3
