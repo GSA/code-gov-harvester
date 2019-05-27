@@ -12,6 +12,7 @@ services:
       - REMOTE_METADATA_LOCATION=https://raw.githubusercontent.com/GSA/code-gov-data/master/agency_metadata.json
       - GITHUB_API_KEY=this-is-not-a-key
       - ES_URI=elasticsearch:9200
+      - SCHEDULE_INDEX_JOBS=false
     depends_on:
       - elasticsearch
     volumes:

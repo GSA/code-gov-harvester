@@ -69,26 +69,38 @@ class Indexer {
 if (require.main === module) {
   const config = getConfig(process.env.NODE_ENV);
   let indexer = new Indexer(config);
-  const scheduleParameters = { scheduled: true, timezone: config.TIME_ZONE };
 
-  indexer.schedule({
-    jobName: `index-repos`,
-    cronConfig: config.REPOS_INDEX_CRON_CONFIG,
-    scheduleParameters,
-    targetFunction: indexer.indexRepos.bind(indexer)
-  });
-  indexer.schedule({
-    jobName: `index-terms`,
-    cronConfig: config.TERMS_INDEX_CRON_CONFIG,
-    scheduleParameters,
-    targetFunction: indexer.indexTerms.bind(indexer)
-  });
-  indexer.schedule({
-    jobName: `index-issues`,
-    cronConfig: config.ISSUE_INDEX_CRON_CONFIG,
-    scheduleParameters,
-    targetFunction: indexer.indexIssues.bind(indexer)
-  });
+  if(config.SCHEDULE_INDEX_JOBS) {
+    const scheduleParameters = { scheduled: true, timezone: config.TIME_ZONE };
+    const jobs = [
+      {
+        jobName: `index-repos`,
+        cronConfig: config.REPOS_INDEX_CRON_CONFIG,
+        scheduleParameters,
+        targetFunction: indexer.indexRepos.bind(indexer)
+      },
+      {
+        jobName: `index-terms`,
+        cronConfig: config.TERMS_INDEX_CRON_CONFIG,
+        scheduleParameters,
+        targetFunction: indexer.indexTerms.bind(indexer)
+      },
+      {
+        jobName: `index-issues`,
+        cronConfig: config.ISSUE_INDEX_CRON_CONFIG,
+        scheduleParameters,
+        targetFunction: indexer.indexIssues.bind(indexer)
+      }
+    ];
+    for(const job of jobs) {
+      indexer.schedule(job);
+      indexer.logger.info(`Scheduled job: ${job.jobName}`);
+    }
+  } else {
+    indexer.indexRepos()
+      .then(() => indexer.indexTerms())
+      .catch(error => indexer.logger.error(error))
+  }
 }
 
 module.exports = Indexer;

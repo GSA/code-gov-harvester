@@ -136,6 +136,9 @@ function getConfig(env='development') {
     && process.env.GET_REMOTE_METADATA === 'true'
     && process.env.REMOTE_METADATA_LOCATION;
 
+  config.SCHEDULE_INDEX_JOBS = process.env.SCHEDULE_INDEX_JOBS
+    && process.env.SCHEDULE_INDEX_JOBS === 'true';
+
   // Used for our cron schedule.
   config.TIME_ZONE = process.env.TIME_ZONE || 'America/New_York';
 
