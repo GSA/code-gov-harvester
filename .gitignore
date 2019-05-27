@@ -166,6 +166,6 @@ $RECYCLE.BIN/
 
 data/**/*.json
 !data/fallback/*.json
-test-results/
 .vscode
 *.csv
+test-results/*
