@@ -1,0 +1,26 @@
+version: '3'
+services:
+  harvester:
+    build: .
+    image: 'codegov/code-gov-harvester:latest'
+    container_name: 'code-gov-harvester'
+    environment:
+      - NODE_ENV=development
+      - LOGGER_LEVEL=info
+      - GET_REMOTE_METADATA=true
+      - GET_GITHUB_DATA=false
+      - REMOTE_METADATA_LOCATION=https://raw.githubusercontent.com/GSA/code-gov-data/master/agency_metadata.json
+      - GITHUB_API_KEY=this-is-not-a-key
+      - ES_URI=elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    volumes:
+      - .:/usr/src/app
+    command: ["./wait-for-it.sh", "elasticsearch:9200", "-t", "30", "--", "npm", "start"]
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:5.6.9"
+    environment:
+      - xpack.security.enabled=false
+    expose:
+      - "9200"
+    container_name: 'code-gov-data'
