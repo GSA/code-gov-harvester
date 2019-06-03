@@ -136,7 +136,7 @@ const contactEmailRule = {
     target.rawScore = ((target.rawScore ? target.rawScore : 0) + Utils.getFieldWeight('contact.email'));
     return target;
   }
-}
+};
 const contactNameRule = {
   validation: function (target) {
     return target['contact.name'] ? true : false;
@@ -357,7 +357,7 @@ const additionalInformationRule = {
     target.rawScore = ((target.rawScore ? target.rawScore : 0) + Utils.getFieldWeight('additional_information'));
     return target;
   }
-}
+};
 
 module.exports = function () {
   return [

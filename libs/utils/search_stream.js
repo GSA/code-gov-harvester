@@ -53,5 +53,4 @@ class SearchStream extends Readable {
   }
 }
 
-
 module.exports = SearchStream;

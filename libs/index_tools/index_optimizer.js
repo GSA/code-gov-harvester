@@ -71,7 +71,7 @@ class IndexOptimizer {
 }
 
 if(!require.main === 'module') {
-  const config = getConfig(porcess.env.NODE_ENV);
+  const config = getConfig(process.env.NODE_ENV);
   const logger = new Logger({ name: 'index-optimizer' });
 
   try {
@@ -80,21 +80,21 @@ if(!require.main === 'module') {
       let requestTimeout = 30000;
 
       if(process.argv[2]) {
-        index = process.argv[2]
+        index = process.argv[2];
       } else {
-        throw new Error('Index was not supplied.')
+        throw new Error('Index was not supplied.');
       }
 
       if(process.argv[3]) {
         if( isNaN(parseInt(process.argv[3])) || parseInt(process.argv[3]) < 0 ) {
-          throw new Error('Timeout option must be a valid positive number.')
+          throw new Error('Timeout option must be a valid positive number.');
         }
 
         requestTimeout = parseInt(process.argv[3]);
       }
 
       IndexOptimizer.optimizeIndex({
-        adapter: apapters.elasticsearch.ElasticsearchAdapter,
+        adapter: adapters.elasticsearch.ElasticsearchAdapter,
         index,
         requestTimeout,
         config,
@@ -103,7 +103,8 @@ if(!require.main === 'module') {
         .then(() => logger.info(`Finished optimizing indices.`))
         .catch(error => logger.error(`An error occurred while optimizing the index: ${index}`, error));
     } else {
-      throw new Error('Not enough arguments were passed to the script. The minimum arguments expected is the index name or alias.')
+      throw new Error('Not enough arguments were passed to the script. The minimum arguments expected ' +
+        'is the index name or alias.');
     }
   } catch(error) {
     logger.error(`An error has occurred while optimizing`, error);
