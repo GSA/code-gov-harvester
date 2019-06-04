@@ -142,10 +142,24 @@ function getConfig(env='development') {
   // These are Unix cron syntax. For more information please take a look at:
   // https://www.npmjs.com/package/node-cron or https://en.wikipedia.org/wiki/Cron#Overview
   // Repos are set to a default of once a day at 5pm
-  // Issues are set to run every 3 hours
+  // Terms are set to a default of once a day at 6pm
+  // Issues are set to a default of once a day at 7pm
   config.REPOS_INDEX_CRON_CONFIG = process.env.REPOS_INDEX_CRON_CONFIG || '0 17 * * *';
   config.TERMS_INDEX_CRON_CONFIG = process.env.TERMS_INDEX_CRON_CONFIG || '0 18 * * *';
-  config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 */3 * * *';
+  config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 19 * * *';
+
+  // Used for Sending Mail
+  config.SEND_STATUS_EMAIL = process.env.SEND_STATUS_EMAIL && process.env.SEND_STATUS_EMAIL.toLowerCase() === "true";
+  config.SEND_SUMMARY_EVERYDAY = process.env.SEND_SUMMARY_EVERYDAY && process.env.SEND_SUMMARY_EVERYDAY.toLowerCase() === "true";
+  config.EMAIL_SERVER = process.env.EMAIL_SERVER || 'localhost';
+  config.EMAIL_SERVER_PORT = process.env.EMAIL_SERVER_PORT || '25';
+  config.EMAIL_SERVER_SECURE = process.env.EMAIL_SERVER_SECURE && process.env.EMAIL_SERVER_SECURE.toLowerCase() === 'true';
+  config.EMAIL_SERVER_USER = process.env.EMAIL_SERVER_USER || '';
+  config.EMAIL_SERVER_PASSWORD = process.env.EMAIL_SERVER_PASSWORD || '';
+  config.EMAIL_FROM = process.env.EMAIL_FROM || '';
+  config.EMAIL_TO = process.env.EMAIL_TO || '';
+  config.EMAIL_CC = process.env.EMAIL_CC || '';
+  config.EMAIL_BCC = process.env.EMAIL_BCC || '';
 
   Object.assign(config, getAppFilesDirectories(config.GET_REMOTE_METADATA));
 
