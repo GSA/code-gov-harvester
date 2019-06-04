@@ -179,6 +179,9 @@ describe('Testing Utils module', function () {
   describe('getCodeJsonVersion', function() {
     let codeJson;
     before(function() {
+      const description = "A hosted, shared-service that provides an API key, " +
+        "analytics, and proxy solution for government web services.";
+
       codeJson = {
         "version": "2.0.0",
         "agency": "GSA",
@@ -188,7 +191,7 @@ describe('Testing Utils module', function () {
         "releases": [
           {
             "name": "api.data.gov",
-            "description": "A hosted, shared-service that provides an API key, analytics, and proxy solution for government web services.",
+            "description": description,
             "permissions": {
               "licenses": null,
               "usageType": "openSource",
@@ -213,10 +216,12 @@ describe('Testing Utils module', function () {
       Utils.getCodeJsonVersion(codeJson).should.be.equal(expectedVersion);
     });
     it('should return code.json repos usign getCodeJsonRepos', function() {
+      const description = "A hosted, shared-service that provides an API key, " +
+        "analytics, and proxy solution for government web services.";
       const expectedRepos = [
         {
           "name": "api.data.gov",
-          "description": "A hosted, shared-service that provides an API key, analytics, and proxy solution for government web services.",
+          "description": description,
           "permissions": {
             "licenses": null,
             "usageType": "openSource",

@@ -1,0 +1,3 @@
+--reporter mocha-junit-reporter
+--recursive
+--reporter-options toConsole=true,mochaFile=test-results/mocha/results.xml
