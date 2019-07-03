@@ -71,6 +71,17 @@ class AbstractIndexer {
       body: this.esMapping
     });
   }
+
+  updateDocument({ index, type, id, document }) {
+    return this.adapter.updateDocument({
+      index,
+      type,
+      id,
+      body: {
+        doc: document
+      }
+    });
+  }
 }
 
 module.exports = {
