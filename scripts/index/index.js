@@ -2,6 +2,7 @@ const getConfig = require('../../config');
 const RepoIndexer = require("./repo");
 const TermIndexer = require("./term");
 const IssueIndexer = require('./issues');
+const GitHubDataIndexer = require('./github_data');
 const { Logger } = require("../../libs/loggers");
 const cron = require('node-cron');
 
@@ -52,6 +53,16 @@ class Indexer {
     }
   }
 
+  async indexGitHubData() {
+    const githubDataIndexer = GitHubDataIndexer(this.config);
+
+    try {
+      await githubDataIndexer.index();
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
+  }
   schedule({ jobName, cronConfig, scheduleParameters, targetFunction }) {
     return cron.schedule(cronConfig, () => {
       this.logger.info(`Executing job: ${jobName}`);
@@ -88,6 +99,12 @@ if (require.main === module) {
     cronConfig: config.ISSUE_INDEX_CRON_CONFIG,
     scheduleParameters,
     targetFunction: indexer.indexIssues.bind(indexer)
+  });
+  indexer.schedule({
+    jobName: `index-github-data`,
+    cronConfig: config.GITHUB_DATA_INDEX_CRON_CONFIG,
+    scheduleParameters,
+    targetFunction: indexer.indexGitHubData.bind(indexer)
   });
 }
 

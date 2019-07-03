@@ -1,11 +1,8 @@
 const getConfig = require("../../../config");
-const IssuesIndexer = require("../../../libs/indexers/issues");
-const { AliasSwapper, IndexCleaner, IndexOptimizer } = require("../../../libs/index_tools");
+const { GitHubDataIndexer } = require("../../../libs/indexers");
 
 const { Logger } = require("../../../libs/loggers");
 const adapters = require('@code.gov/code-gov-adapter');
-
-const DAYS_TO_KEEP = process.env.DAYS_TO_KEEP || 2;
 
 /**
  * Defines the class responsible for creating and managing the elasticsearch indexes
@@ -36,27 +33,9 @@ class Indexer {
     this.logger.info('Started indexing.');
 
     try {
-      const issueIndexInfo = await IssuesIndexer.init(this.elasticsearchAdapter, this.config);
-      await IndexOptimizer.optimizeIndex({
-        adapter: this.elasticsearchAdapter,
-        index: issueIndexInfo.esIndex,
-        config: this.config
-      });
-      await AliasSwapper.swapAlias({
-        adapter: this.elasticsearchAdapter,
-        index: issueIndexInfo.esIndex,
-        alias: issueIndexInfo.esAlias,
-        config: this.config
-      });
-      await IndexCleaner.cleanIndexes({
-        adapter: this.elasticsearchAdapter,
-        alias: issueIndexInfo.esAlias,
-        dayToKeep: DAYS_TO_KEEP,
-        config: this.config
-      });
+      await GitHubDataIndexer.init(this.elasticsearchAdapter, this.config);
 
-      this.logger.debug(`Finished indexing repos`);
-      return issueIndexInfo;
+      this.logger.debug(`Finished indexing GitHub Data`);
     } catch(error) {
       this.logger.trace(error);
       throw error;
@@ -69,7 +48,7 @@ class Indexer {
 if (require.main === module) {
   let indexer = new Indexer(getConfig(process.env.NODE_ENV));
   indexer.index()
-    .then(indexInfo => indexer.logger.debug(`Finished indexing repos GitHub data ${JSON.stringify(indexInfo)}`))
+    .then(() => indexer.logger.debug(`Finished indexing GitHub data.`))
     .catch(error => indexer.logger.error(error));
 }
 
