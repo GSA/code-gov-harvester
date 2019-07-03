@@ -73,8 +73,17 @@ async function getRepoIssues({ owner, repo, client }) {
   }
 }
 
+async function getGitHubRepoData({ owner, repo, client }) {
+  try {
+    return await integrations.github.getRepoData({ owner, repo, client });
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getClient,
   getCodeGovRepos,
-  getRepoIssues
+  getRepoIssues,
+  getGitHubRepoData
 };
