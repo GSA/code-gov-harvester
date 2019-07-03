@@ -147,6 +147,7 @@ function getConfig(env='development') {
   config.REPOS_INDEX_CRON_CONFIG = process.env.REPOS_INDEX_CRON_CONFIG || '0 17 * * *';
   config.TERMS_INDEX_CRON_CONFIG = process.env.TERMS_INDEX_CRON_CONFIG || '0 18 * * *';
   config.ISSUE_INDEX_CRON_CONFIG = process.env.ISSUE_INDEX_CRON_CONFIG || '0 19 * * *';
+  config.GITHUB_DATA_INDEX_CRON_CONFIG = process.env.GITHUB_DATA_INDEX_CRON_CONFIG || '0 20 * * *';
 
   // Used for Sending Mail
   config.SEND_STATUS_EMAIL = process.env.SEND_STATUS_EMAIL && process.env.SEND_STATUS_EMAIL.toLowerCase() === "true";
