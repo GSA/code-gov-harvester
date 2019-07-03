@@ -99,7 +99,7 @@ if (require.main === module) {
   } else {
     indexer.indexRepos()
       .then(() => indexer.indexTerms())
-      .catch(error => indexer.logger.error(error))
+      .catch(error => indexer.logger.error(error));
   }
 }
 
