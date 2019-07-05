@@ -16,7 +16,7 @@ class GitHubDataIndexer extends AbstractIndexer {
   async updateRepo(repoId, repoData) {
 
     return await this.updateDocument({
-      index: this.esIndex,
+      index: this.esAlias,
       type: this.esType,
       id: repoId,
       document: repoData,
@@ -25,11 +25,15 @@ class GitHubDataIndexer extends AbstractIndexer {
   }
   parseGitHubData(repoData) {
     return {
-      stars: repoData.stargazers_count,
-      watchers: repoData.watchers_count,
-      forks: repoData.forks_count,
-      created_at: repoData.created_at,
-      updated_at: repoData.updated_at
+      remoteVCSData: {
+        remoteLocation: "github",
+        description: repoData.description,
+        stars: repoData.stargazers_count,
+        watchers: repoData.watchers_count,
+        forks: repoData.forks_count,
+        created_at: repoData.created_at,
+        updated_at: repoData.updated_at
+      }
     };
   }
   async indexGitHubData() {
@@ -45,7 +49,7 @@ class GitHubDataIndexer extends AbstractIndexer {
       }
 
       if(repoData) {
-        const parsedData = parseGitHubData(repoData)
+        const parsedData = this.parseGitHubData(repoData);
         await this.updateRepo(codeGovRepoId, parsedData);
       }
     }
