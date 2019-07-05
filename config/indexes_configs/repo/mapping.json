@@ -320,6 +320,10 @@
         "type": "object",
         "dynamic": true
       },
+      "remoteVCSData": {
+        "type": "object",
+        "dynamic": true
+      },
       "date": {
         "type": "object",
         "include_in_root": true,
