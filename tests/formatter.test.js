@@ -103,6 +103,12 @@ describe('Formatter Test', () => {
 
   describe('_formatDate', () => {
     it('should not throw an error', () => expect(() => formatter._formatDate('2016-08-01')).to.not.throw());
+    it('should parse 2016-08-01', () => expect(() => formatter._formatDate('2016-08-01')).to.not.throw());
+    it('should fail parse: 2000-13-01', () => expect(() => formatter._formatDate('2000-13-01')).to.throw());
+    it('should parse ISO 8601 + offset: 2018-07-01T01:01:01+04:00', () => expect(() => formatter._formatDate('2018-07-01T01:01:01+04:00')).to.not.throw());
+    it('should parse ISO 8601 2016-11-29T00:16:44.628Z', () => expect(() => formatter._formatDate('2016-11-29T00:16:44.628Z')).to.not.throw());
+    it('should fail parse: 42736', () => expect(() => formatter._formatDate('42736')).to.throw());
+    it('should fail parse: 2013', () => expect(() => formatter._formatDate('2013')).to.throw());
     it('should throw an error', () => expect(formatter._formatDate).to.throw());
   });
   describe('_getUsageCode', () => {
