@@ -167,11 +167,7 @@ class Formatter {
       delete repo.agency.id;
     }
 
-    try {
-      this._formatDates(repo);
-    } catch(error) {
-      throw error;
-    }
+    this._formatDates(repo);
 
     return repo;
   }
