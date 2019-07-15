@@ -55,7 +55,7 @@ class AgencyJsonStream extends Transform {
   }
 
   async _getAgencyCodeJson(agency){
-    this.logger.info(`Entered _getAgencyCodeJson - Agency: ${agency.acronym}`);
+    this.logger.debug(`Entered _getAgencyCodeJson - Agency: ${agency.acronym}`);
     
     Reporter.reportFallbackUsed(agency.acronym, false);
     Reporter.reportRemoteJsonRetrived(agency.acronym, false);

@@ -13,32 +13,29 @@ class Formatter {
   }
 
   _formatDate(date) {
-    const result = moment(date, 'YYYY-MM-DD', true).utc().toJSON();
-    if(result === null) {
-      throw new Error('Bad date format');
+    const ISO8601 = /^\d{4}(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d+)?(([+-]\d\d:\d\d)|Z)?)?))$/i;
+    let result = null;
+
+    // Check for ISO 8601 formatting (YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss[Z|+offset])
+    if (ISO8601.test(date)) {
+      result = moment(date);
     }
 
-    return result;
+    if (result === null || !result.isValid()) throw `Bad date format: ${date}`;
+
+    return result.utc().toJSON();
   }
 
   _formatDates(repo) {
     if (repo.date) {
-      try {
-        repo.date.lastModified = repo.date.lastModified
-          ? this._formatDate(repo.date.lastModified)
-          : null;
-
-        repo.date.metadataLastUpdated = repo.date.metadataLastUpdated
-          ? this._formatDate(repo.date.metadataLastUpdated)
-          : null;
-
-        repo.date.created = repo.date.created
-          ? this._formatDate(repo.date.created)
-          : null;
-      } catch(error) {
-        throw error;
+      for (const key in repo.date) {
+        try {
+          repo.date[key] = this._formatDate(repo.date[key]);
+        } catch(error) {
+          repo.date[key] = null;
+          this.logger.info(`Repo ${repo.name}(${repo.repoID}): ${key}: ${error}`);
+        }
       }
-
     }
   }
 
@@ -170,11 +167,7 @@ class Formatter {
       delete repo.agency.id;
     }
 
-    try {
-      this._formatDates(repo);
-    } catch(error) {
-      throw error;
-    }
+    this._formatDates(repo);
 
     return repo;
   }
@@ -191,7 +184,7 @@ class Formatter {
 
         this.logger.debug('formatted repo', formattedRepo);
       } catch (error) {
-        this.logger.error(`Error when formatting repo: ${error}`);
+        this.logger.error(`Error when formatting repo (${repo.name}): ${error}`);
         reject(error);
       }
 
