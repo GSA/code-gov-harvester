@@ -117,11 +117,11 @@ const tagsRules = {
 
     let multiplier = 0.0;
     if (tags.length >= 3) {
-      multiplier = 1.0
+      multiplier = 1.0;
     } else if (tags.length === 2) {
-      multiplier = 0.6
+      multiplier = 0.6;
     } else if (tags.length === 1) {
-      multiplier = 0.4
+      multiplier = 0.4;
     }
     target.rawScore = ((target.rawScore ? target.rawScore : 0) + (Utils.getFieldWeight('tags') * multiplier));
 

@@ -39,7 +39,7 @@ class StatusIndexer extends AbstractIndexer {
       } catch (error) {
         this.logger.error(error);
         // throw error;  ** Don't throw error if cannot get previous status data **
-        }
+      }
     }
     return returnData;
   }
