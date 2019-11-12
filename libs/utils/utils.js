@@ -267,7 +267,7 @@ class Utils {
     }
     let nextDt = new Date(dt);
     nextDt = new Date(nextDt.setDate(nextDt.getDate() + 1));
-    return (dt.getMonth() !== nextDt.getMonth())
+    return (dt.getMonth() !== nextDt.getMonth());
   }
 }
 

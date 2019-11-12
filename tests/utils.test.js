@@ -293,9 +293,9 @@ describe('Testing Utils module', function () {
   describe('getFieldWeight', function() {
     it('should return weight value of field passed', function() {
 
-      Utils.getFieldWeight('name').should.be.equal(1);
-      Utils.getFieldWeight('repositoryURL').should.be.equal(0.8);
-      Utils.getFieldWeight('disclaimerURL').should.be.equal(0.4);
+      Utils.getFieldWeight('name').should.be.equal(10);
+      Utils.getFieldWeight('repositoryURL').should.be.equal(10);
+      Utils.getFieldWeight('disclaimerURL').should.be.equal(3);
 
     });
   });

@@ -228,8 +228,8 @@ class AgencyJsonStream extends Transform {
         let counts = {
           processed: 0,
           duplicates: 0,
-          total: 0,
-        }
+          total: 0
+        };
         formattedRepos.forEach(repo => {
           counts.processed += 1;
           if (repoIDs.includes(repo.repoID)) {
@@ -240,7 +240,7 @@ class AgencyJsonStream extends Transform {
             counts.total += 1;
           }
           if (repo.permissions && repo.permissions.usageType) {
-              counts[repo.permissions.usageType] = counts[repo.permissions.usageType] ? counts[repo.permissions.usageType] + 1 : 1;
+            counts[repo.permissions.usageType] = counts[repo.permissions.usageType] ? counts[repo.permissions.usageType] + 1 : 1;
           } else {
             counts.unknown = counts.unknown ? counts.unknown + 1 : 1;
           }
@@ -252,7 +252,7 @@ class AgencyJsonStream extends Transform {
       .then(scoredRepos => scoredRepos.forEach(repo => { 
         repo.score = parseFloat((repo.rawScore * 10 / Utils.getMaxTotalWeight()).toFixed(1));
         delete repo.rawScore;
-        this.push(repo) 
+        this.push(repo); 
       }))
       .then(() => callback())
       .catch(error => {

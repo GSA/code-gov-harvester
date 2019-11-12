@@ -1,0 +1,120 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/code-gov-harvester
+    docker:
+      - image: circleci/node:lts-jessie
+      - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
+        environment:
+          - cluster.name: es
+          - xpack.security.enabled: false
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9250
+          - discovery.type: single-node
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: install-node-modules
+          command: npm install
+      - run:
+          name: run-linter
+          command: npm run lint
+      - run:
+          name: run-security-check
+          command: npm audit
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - persist_to_workspace:
+          root: ~/code-gov-harvester
+          paths: .
+  test:
+    working_directory: ~/code-gov-harvester
+    docker:
+      - image: circleci/node:lts-jessie
+      - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
+        environment:
+          - cluster.name: es
+          - xpack.security.enabled: false
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9250
+          - discovery.type: single-node
+    environment:
+      NODE_ENV: "testing"
+    steps:
+      - attach_workspace:
+          at: ~/code-gov-harvester
+      - run:
+          name: download-cc-test-reporter
+          command: |
+            mkdir -p tmp/
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+            chmod +x ./tmp/cc-test-reporter
+      - run:
+          name: make-test-reporter-executable
+          command: chmod +x ./tmp/cc-test-reporter
+      - run:
+          command: ./tmp/cc-test-reporter before-build
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: run-test
+          command: npm run test
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      #- run:
+      #    name: upload-test-report
+      #    command: ./tmp/cc-test-reporter after-build -t lcov --exit-code $?
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: coverage
+          prefix: coverage
+      - persist_to_workspace:
+          root: ~/code-gov-harvester
+          paths: .
+  publish:
+    working_directory: ~/code-gov-harvester
+    docker:
+      - image: circleci/node:lts-jessie
+      - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
+        environment:
+          - cluster.name: es
+          - xpack.security.enabled: false
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9250
+          - discovery.type: single-node
+    steps:
+      - attach_workspace:
+          at: ~/code-gov-harvester
+      - run:
+          name: Authenticate with NPM registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/code-gov-integrations/.npmrc
+      - deploy:
+          name: Publish to NPM registry
+          command: npm publish --access public
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - publish:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v(\d+\.*){3}/
+            branches:
+              ignore: /.*/

@@ -167,6 +167,11 @@ class Formatter {
       delete repo.agency.id;
     }
 
+    // remove `partners` if incorrect type, code-gov-validator crashes if malformed
+    if (repo.hasOwnProperty('partners') && !(repo.partners instanceof Array)) {
+      delete repo.partners;
+    }
+
     this._formatDates(repo);
 
     return repo;
