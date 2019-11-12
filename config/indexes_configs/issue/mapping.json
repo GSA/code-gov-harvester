@@ -54,6 +54,9 @@
           }
         }
       },
+      "repository": {
+        "type": "keyword"
+      },
       "repositoryURL": {
         "type": "keyword"
       },

@@ -53,7 +53,7 @@ async function getCodeGovRepos(adapter) {
 
     return {
       owner,
-      repo ,
+      repo,
       agency: {
         name: codeGovRepo.agency.name,
         acronym: codeGovRepo.agency.acronym,
