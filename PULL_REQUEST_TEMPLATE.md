@@ -21,7 +21,7 @@ For more information, see our [CONTRIBUTING](https://github.com/GSA/code-gov-har
 * [ ] Feature 1
 * [ ] Breaking changes
 
-## Motication 
+## Motivation
 
 <!-- Explain the motivation for making this PR. This is the place to go into the details of the issues solved
 <!-- Example: When "Adding a function to do X", explain why it is necessary to have a way to do X. -->
