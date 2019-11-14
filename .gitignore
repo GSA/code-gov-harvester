@@ -169,3 +169,4 @@ data/**/*.json
 .vscode
 *.csv
 test-results/*
+manifest*.yml
