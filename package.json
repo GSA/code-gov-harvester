@@ -1,6 +1,6 @@
 {
   "name": "code-gov-harvester",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Code.gov code.json harvester and data manipulation tool",
   "scripts": {
     "debug": "node --inspect ./scripts/index/index.js",
@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@code.gov/code-gov-adapter": "^1.1.6",
-    "@code.gov/code-gov-integrations": "^1.1.1",
+    "@code.gov/code-gov-integrations": "^1.1.3",
     "@code.gov/code-gov-validator": "^1.0.1",
     "JSONStream": "^1.3.5",
     "cfenv": "^1.2.2",
