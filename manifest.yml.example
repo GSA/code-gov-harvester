@@ -1,5 +1,5 @@
 applications:
-- name: code-gov-harvester
+- name: code-gov-harvester-v1.0.0
   memory: 200M
   instances: 1
   disk_quota: 200M
@@ -11,8 +11,8 @@ applications:
     CF_STAGING_TIMEOUT: 15
     CF_STARTUP_TIMEOUT: 15
     LOGGER_LEVEL: info
-    GITHUB_TOKEN: not-a-token
     GITHUB_AUTH_TYPE: token
+    GITHUB_TOKEN: NOT_A_TOKEN
     GET_REMOTE_METADATA: true
     REMOTE_METADATA_LOCATION: https://raw.githubusercontent.com/GSA/code-gov-data/master/agency_metadata.json
     GET_GITHUB_DATA: true

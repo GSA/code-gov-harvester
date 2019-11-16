@@ -37,7 +37,10 @@ Before running any of the commands included in the package.json file there are s
 
 #### Docker
 
-To be added soon.
+A docker-compose file has been added for convience. To run a dockerized version of the harvester, the standard `npm install` must be ran first; the files are copied into the container from the host.
+Then, running `docker-compose up` will start the container.
+
+This `docker-compose` file includes an elasticsearch configuration running on port 9200.
 
 ### Configuring
 
