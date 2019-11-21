@@ -18,6 +18,7 @@
     "no-param-reassign": 0,
     "no-unused-expressions": 0,
     "no-unused-vars": 1,
+    "no-control-regex": 0,
     "global-require": 0,
     "brace-style": 1,
     "camelcase": 0,
