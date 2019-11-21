@@ -252,13 +252,15 @@ class Utils {
     return false;
   }
 
+  /*
+     Removes UTF-8 encoding from imported json files
+     regex removes all chars that are not x01 - x7F in ASCII
+     See post here: https://stackoverflow.com/a/44472084
+  */
   static stripBom(input) {
     const inputString = input.toString();
 
-    if(inputString.charCodeAt(0) === 0xFEFF) {
-      return inputString.slice(1);
-    }
-    return inputString;
+    return inputString.replace(/[^\x01-\x7F]/g, "");
   }
 
   static isLastDayOfMonth(dt=null) {
