@@ -23,7 +23,7 @@ cd code-gov-harvester && npm install
 
 #### Development Dependencies
 
-### Running
+## Running
 
 #### Environment Variables
 
@@ -34,6 +34,8 @@ Before running any of the commands included in the package.json file there are s
   * `development` or `dev`
 #### Metadata Files
 
+#### Configuring
+
 #### Scripts
 
 #### Elasticsearch
@@ -42,7 +44,6 @@ Before running any of the commands included in the package.json file there are s
 
 To be added soon.
 
-### Configuring
 
 ## Contributing
 
