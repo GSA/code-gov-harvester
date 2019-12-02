@@ -1,4 +1,7 @@
 # Code.gov Harvester
+[![CircleCI](https://circleci.com/gh/GSA/code-gov-harvester/tree/master.svg?style=svg&circle-token=373dfb7b6faa8913c9b4c1e292c4638614e3db21)](https://circleci.com/gh/GSA/code-gov-harvester/tree/master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/d2c7b46b5646bf674802/maintainability)](https://codeclimate.com/github/GSA/code-gov-harvester/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d2c7b46b5646bf674802/test_coverage)](https://codeclimate.com/github/GSA/code-gov-harvester/test_coverage)
 
 ___This is still a work in progress___
 
