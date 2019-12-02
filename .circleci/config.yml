@@ -1,7 +1,11 @@
 version: 2
+defaults: &defaults
+  working_directory: ~/code-gov-harvester
+  environment:
+    - CC_TEST_REPORTER_ID: 0a0c3158767ecc2a7299cc53df1f6ccd798486216e9d8988c7edc55df3c1d5df
 jobs:
   build:
-    working_directory: ~/code-gov-harvester
+    <<: *defaults
     docker:
       - image: circleci/node:lts-jessie
       - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
@@ -33,7 +37,7 @@ jobs:
           root: ~/code-gov-harvester
           paths: .
   test:
-    working_directory: ~/code-gov-harvester
+    <<: *defaults
     docker:
       - image: circleci/node:lts-jessie
       - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
@@ -45,7 +49,8 @@ jobs:
           - http.port: 9250
           - discovery.type: single-node
     environment:
-      NODE_ENV: "testing"
+      - NODE_ENV: "testing"
+      - CC_TEST_REPORTER_ID: 0a0c3158767ecc2a7299cc53df1f6ccd798486216e9d8988c7edc55df3c1d5df
     steps:
       - attach_workspace:
           at: ~/code-gov-harvester
@@ -64,14 +69,17 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: run-test
-          command: npm run test
+          command: |
+            mkdir -p ~/code-gov-harvester/coverage
+            npm run test
+            ./node_modules/.bin/nyc report --reporter=text-lcov > ~/code-gov-harvester/coverage/lcov.info
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
-      #- run:
-      #    name: upload-test-report
-      #    command: ./tmp/cc-test-reporter after-build -t lcov --exit-code $?
+      - run:
+          name: upload-test-report
+          command: ./tmp/cc-test-reporter after-build -t lcov --exit-code $?
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -81,7 +89,7 @@ jobs:
           root: ~/code-gov-harvester
           paths: .
   publish:
-    working_directory: ~/code-gov-harvester
+    <<: *defaults
     docker:
       - image: circleci/node:lts-jessie
       - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
