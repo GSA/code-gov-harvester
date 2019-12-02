@@ -2,7 +2,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/code-gov-harvester
   environment:
-    - CC_TEST_REPORTER_ID: 5bfae24ac663c4286600023a
+    - CC_TEST_REPORTER_ID: 0a0c3158767ecc2a7299cc53df1f6ccd798486216e9d8988c7edc55df3c1d5df
 jobs:
   build:
     <<: *defaults
