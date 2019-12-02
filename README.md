@@ -46,6 +46,17 @@ To be added soon.
 
 ## Contributing
 
+Here’s how you can help contribute to code.gov:
+
+- Source Code Policy
+
+  - To provide feedback on the [Federal Source Code Policy](https://sourcecode.cio.gov/), follow [this issue tracker](https://github.com/WhiteHouse/source-code-policy/issues)
+
+- Code.gov
+  - To provide feedback on code-gov-harvester, please checkout our [Contributing Guildelines](CONTRIBUTING.md).
+  - To contribute to the Code.gov data, go to the [code-gov-data] repo at (https://github.com/GSA/code-gov-data)
+  - Checkout [code-gov](https://github.com/GSA/code-gov) for a list of additional project repositories. If you aren't sure where your question or idea fits, this is a good place to share it.
+
 ## Generating License Data
 
 To update the `dependency_licenses.json` file, run `npm run licenses`.
