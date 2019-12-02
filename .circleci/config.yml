@@ -46,6 +46,7 @@ jobs:
           - discovery.type: single-node
     environment:
       NODE_ENV: "testing"
+      CC_TEST_REPORTER_ID: d2c7b46b5646bf674802
     steps:
       - attach_workspace:
           at: ~/code-gov-harvester
