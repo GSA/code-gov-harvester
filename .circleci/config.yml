@@ -65,8 +65,9 @@ jobs:
       - run:
           name: run-test
           command: |
+            mkdir -p ~/code-gov-harvester/coverage
             npm run test
-            ./node_modules/.bin/nyc report --reporter=text-lcov > coverage/lcov.info
+            ./node_modules/.bin/nyc report --reporter=text-lcov > ~/code-gov-harvester/coverage/lcov.info
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
