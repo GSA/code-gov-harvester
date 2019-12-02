@@ -49,7 +49,8 @@ jobs:
           - http.port: 9250
           - discovery.type: single-node
     environment:
-      NODE_ENV: "testing"
+      - NODE_ENV: "testing"
+      - CC_TEST_REPORTER_ID: 0a0c3158767ecc2a7299cc53df1f6ccd798486216e9d8988c7edc55df3c1d5df
     steps:
       - attach_workspace:
           at: ~/code-gov-harvester
