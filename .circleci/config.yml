@@ -64,14 +64,16 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: run-test
-          command: npm run test
+          command: |
+            npm run test
+            ./node_modules/.bin/nyc report --reporter=text-lcov > coverage/lcov.info
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
-      #- run:
-      #    name: upload-test-report
-      #    command: ./tmp/cc-test-reporter after-build -t lcov --exit-code $?
+      - run:
+          name: upload-test-report
+          command: ./tmp/cc-test-reporter after-build -t lcov --exit-code $?
       - store_test_results:
           path: test-results
       - store_artifacts:
