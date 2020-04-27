@@ -60,6 +60,7 @@ async function normalizeRepoScores({ adapter, index, type, config, log=undefined
     }
     logger.info(`Updated ${total} repos`);
   } catch(error) {
+    console.log(error);
     throw error;
   }
 }
