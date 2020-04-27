@@ -69,6 +69,7 @@ async function getRepoIssues({ owner, repo, client }) {
   try {
     return await integrations.github.getRepoIssues({owner, repo, labels: 'code.gov', client});
   } catch(error) {
+    console.log(error);
     throw error;
   }
 }

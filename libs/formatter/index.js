@@ -168,7 +168,7 @@ class Formatter {
     }
 
     // remove `partners` if incorrect type, code-gov-validator crashes if malformed
-    if (repo.hasOwnProperty('partners') && !(repo.partners instanceof Array)) {
+    if (Object.prototype.hasOwnProperty.call(repo, 'partners') && !(repo.partners instanceof Array)) {
       delete repo.partners;
     }
 

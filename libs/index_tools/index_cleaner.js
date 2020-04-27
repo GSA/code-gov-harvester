@@ -26,6 +26,7 @@ class IndexCleaner {
         apiVersion: config.ELASTICSEARCH_API_VERSION
       });
     } catch(error) {
+      console.log(error);
       throw error;
     }
   }
