@@ -1,6 +1,6 @@
 {
   "name": "code-gov-harvester",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Code.gov code.json harvester and data manipulation tool",
   "scripts": {
     "debug": "node --inspect ./scripts/index/index.js",
