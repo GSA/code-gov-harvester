@@ -62,7 +62,7 @@
     "latinize": "^0.4.0",
     "license-checker": "^25.0.1",
     "node-cron": "^2.0.3",
-    "node-fetch": "2.6.1",
+    "node-fetch": "^2.6.1",
     "nodemailer": "^6.0.0",
     "snyk": "^1.316.1",
     "winston": "^3.1.0"
