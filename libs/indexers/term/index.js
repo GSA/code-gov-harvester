@@ -18,6 +18,8 @@ class RepoTermIndexerStream extends Writable {
     this.logger.debug(`Indexing term (${id}).`);
 
     return new Promise((resolve, reject) => {
+      if (id.length > 512) reject('Id field is too long');
+
       this.termIndexer.indexDocument({
         index: this.termIndexer.esIndex,
         type: this.termIndexer.esType,
@@ -37,7 +39,9 @@ class RepoTermIndexerStream extends Writable {
           this.logger.error(err);
           reject(err);
         });
-    });
+    })
+    //@TODO: Make this more visible
+    .catch (err => this.logger.error(err));
   }
 
   _write(term, enc, next) {

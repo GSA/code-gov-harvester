@@ -1,6 +1,6 @@
 {
   "name": "code-gov-harvester",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Code.gov code.json harvester and data manipulation tool",
   "scripts": {
     "debug": "node --inspect ./scripts/index/index.js",
@@ -64,8 +64,8 @@
     "node-cron": "^2.0.3",
     "node-fetch": "^2.6.1",
     "nodemailer": "^6.0.0",
-    "winston": "^3.1.0",
-    "snyk": "^1.316.1"
+    "snyk": "^1.316.1",
+    "winston": "^3.1.0"
   },
   "engines": {
     "node": "^10.12.0",
